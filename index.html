@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeviCe Protezione Civile TM - 2025</title>
+    
+    <style>
+        :root {
+            --pc-blue: #002d5a; --pc-orange: #ff9900; --pc-green: #28a745;
+            --pc-red: #d32f2f; --pc-bg: #eef2f5; --livery-blue: #0056b3;
+            --status-on: #28a745; --status-off: #d32f2f;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--pc-bg); color: #2c3e50; margin: 0; padding: 0; text-align: center; }
+        .container { width: 95%; margin: auto; }
+        .logo-full-width { width: 100%; height: auto; display: block; }
+        
+        .livery-lines { display: flex; flex-direction: column; width: 100%; }
+        .line-yellow { background-color: var(--pc-orange); height: 6px; }
+        .line-white { background-color: #ffffff; height: 6px; }
+        .line-blue { background-color: var(--livery-blue); height: 6px; }
+
+        /* ISTRUZIONI */
+        .instructions-box { background: #ffffff; border-left: 8px solid var(--pc-orange); border-radius: 12px; margin: 20px auto; padding: 15px 25px; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: left; }
+        .instructions-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 15px; padding-bottom: 8px; }
+        .instructions-header h3 { margin: 0; color: var(--pc-blue); font-size: 1.2em; text-transform: uppercase; }
+        .instructions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 10px; }
+        .instruction-item { display: flex; align-items: flex-start; gap: 12px; font-size: 0.85em; color: #555; }
+        .inst-icon { font-size: 1.4em; background: #f8f9fa; padding: 10px; border-radius: 10px; min-width: 40px; text-align: center; }
+
+        /* DEVICE CARD */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1600px; margin: 30px auto; align-items: stretch; }
+        .device-card { display: flex; flex-direction: column; gap: 10px; background: #ffffff; padding: 20px; border-radius: 15px; border: 1px solid #000; box-shadow: 0 4px 6px rgba(0,0,0,0.05); min-height: 680px; justify-content: space-between; transition: 0.3s; }
+        .device-name-input { width: 100%; height: 42px; border: 2px solid #edf2f7; border-radius: 8px; text-align: center; font-weight: 800; color: var(--pc-blue); background: #f8fafc; }
+        .device-card button, .section-card button { padding: 10px; font-size: 0.85em; border-radius: 6px; border: 1px solid #d1d9e6; background-color: #f8fafc; font-weight: 600; cursor: pointer; transition: 0.3s; user-select: none; }
+        .device-status-indicator { padding: 10px; font-size: 0.85em; font-weight: bold; border-radius: 6px; text-align: center; background-color: #bdc3c7; color: #333; }
+        
+        /* PORT FORWARDING BOX */
+        .port-section { background: #ffffff; padding: 30px; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 20px; }
+        .port-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .port-card { background: #f8fafc; padding: 20px; border-radius: 15px; border-top: 4px solid var(--pc-orange); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .port-label-input { width: 100%; padding: 8px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #cbd5e0; text-align: center; font-weight: bold; color: var(--pc-blue); font-size: 0.8em; }
+        .port-btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* LED & ANIMAZIONI */
+        @keyframes blink-green { 0% { background-color: var(--pc-green); color: white; } 50% { background-color: #98fb98; color: black; } 100% { background-color: var(--pc-green); color: white; } }
+        @keyframes blink-red { 0% { background-color: var(--pc-red); color: white; } 50% { background-color: #ffcccb; color: black; } 100% { background-color: var(--pc-red); color: white; } }
+        .blink-on { animation: blink-green 0.6s infinite; }
+        .blink-off { animation: blink-red 0.6s infinite; }
+        .status-on-active { background-color: var(--status-on) !important; color: white !important; }
+        .status-off-active { background-color: var(--status-off) !important; color: white !important; }
+        .status-error { background-color: var(--pc-orange) !important; color: var(--pc-blue) !important; }
+        
+        .section-card { background: #fff; padding: 25px; border-radius: 20px; max-width: 1100px; margin: 40px auto; border-top: 5px solid var(--pc-blue); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .led-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
+        .led-item { background: #ffffff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .led-bulb { width: 18px; height: 18px; border-radius: 50%; background-color: #cbd5e0; }
+        .led-bulb.status-online { background-color: var(--pc-green); box-shadow: 0 0 12px rgba(40, 167, 69, 0.6); }
+        .led-bulb.status-offline { background-color: var(--pc-red); box-shadow: 0 0 12px rgba(211, 47, 47, 0.4); }
+
+        footer { background-color: var(--pc-blue); color: #ffffff; margin-top: 60px; padding: 0; }
+        .footer-content { padding: 25px 0; font-weight: 500; }
+    </style>
+</head>
+<body>
+<div class="livery-lines"><div class="line-yellow"></div><div class="line-white"></div><div class="line-blue"></div></div>
+<img src="IMMAGINI/golfo_tecno.png" alt="Logo" class="logo-full-width">
+
+<div class="container">
+    <div class="instructions-box">
+        <div class="instructions-header">
+            <h3>Pannello Operativo Digitale <span style="font-size: 0.6em; background: var(--pc-blue); color: white; padding: 2px 8px; border-radius: 10px;">v4.5.25</span></h3>
+            <button onclick="apriSupporto()" style="background:var(--pc-orange); color:var(--pc-blue); border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">🛠️ RICHIEDI SUPPORTO</button>
+        </div>
+        <div class="instructions-grid">
+            <div class="instruction-item"><span class="inst-icon" style="color:#0056b3;">📡</span><div><strong>RETE SINCRONIZZATA</strong><span>Aggiornamento ogni 15s su tutti i terminali.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon" style="color:#ff9900;">⚡</span><div><strong>CONTROLLO RELÈ</strong><span>Invio comandi con feedback visivo a LED.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon" style="color:#28a745;">⚙️</span><div><strong>SUPPORTO</strong><span>Area segnalazione guasti e assistenza IT.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon" style="color:#d32f2f;">📊</span><div><strong>DIAGNOSTICA</strong><span>Monitoraggio ingressi e sensori I/O.</span></div></div>
+        </div>
+    </div>
+
+    <div class="grid-container" id="devicesGrid">
+        <script>
+            const devices = [
+                { ip: '10', nome: 'RUT_955B (.10)' }, { ip: '12', nome: 'RUT_955B (.12)' },
+                { ip: '13', nome: 'PONTE RADIO (.13)' }, { ip: '14', nome: 'RUT_956A' },
+                { ip: '15', nome: 'RUT_955B (.15)' },
+                { ip: null, nome: 'SLOT DISPONIBILE' }, { ip: null, nome: 'SLOT DISPONIBILE' }, { ip: null, nome: 'SLOT DISPONIBILE' }
+            ];
+            const grid = document.getElementById('devicesGrid');
+            devices.forEach(dev => {
+                if (dev.ip) {
+                    grid.innerHTML += `
+                    <div class="device-card">
+                        <button onclick="apriIndirizzo('${dev.ip}')">🌐 ACCESSO REMOTO .${dev.ip}</button>
+                        <div id="ping-indicator-${dev.ip}" class="device-status-indicator">VERIFICA...</div>
+                        <button onclick="checkIOStatusGrafico('${dev.ip}')">📊 STATO INGRESSI</button>
+                        <input type="text" class="device-name-input" value="${dev.nome}">
+                        <img src="IMMAGINI/telt.jpg" style="max-width:140px; margin:auto;">
+                        <button onclick="toggleTeltonikaIO('on', '${dev.ip}', this)">| ATTIVA RELÈ_1</button>
+                        <button onclick="toggleTeltonikaIO('off', '${dev.ip}', this)">⭘ DISATTIVA RELÈ_1</button>
+                        <div id="indicator-${dev.ip}" class="device-status-indicator">STATO RELÈ_1</div>
+                        <button onclick="toggleTeltonikaOC('on', '${dev.ip}', this)">| ATTIVA RELÈ_2</button>
+                        <button onclick="toggleTeltonikaOC('off', '${dev.ip}', this)">⭘ DISATTIVA RELÈ_2</button>
+                        <div id="indicator-oc-${dev.ip}" class="device-status-indicator">STATO RELÈ_2</div>
+                    </div>`;
+                } else {
+                    grid.innerHTML += `<div class="device-card" style="border:2px dashed #cbd5e0; opacity:0.6; background:#f8fafc; justify-content:center;"><div style="font-size:3em; color:#cbd5e0;">➕</div><div style="font-weight:bold; color:#94a3b8;">${dev.nome}</div></div>`;
+                }
+            });
+        </script>
+    </div>
+
+    <div class="section-card">
+        <h4>📡 Monitoraggio Infrastruttura Ethernet Locale</h4>
+        <div class="led-grid" id="infraGrid"></div>
+    </div>
+
+    <div class="section-card">
+        <h4>⌨ Inoltro Porte e Accesso Manuale</h4>
+        <div style="display:flex; justify-content:center; margin-bottom:25px;">
+            <input type="text" id="ipManualeLibero" class="device-name-input" placeholder="IP Destinazione (es. 192.168.1.XX)" style="max-width:450px; border:2px solid var(--pc-orange);">
+        </div>
+        <div class="port-grid">
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="TENDA TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8082')">PORTA 8082</button>
+                    <button onclick="apriPortaManuale('8083')">PORTA 8083</button>
+                </div>
+            </div>
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="MICROTIK TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8085')">PORTA 8085</button>
+                    <button onclick="apriPortaManuale('8086')">PORTA 8086</button>
+                </div>
+            </div>
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="MICROLINK TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8088')">PORTA 8088</button>
+                    <button onclick="apriPortaManuale('8089')">PORTA 8089</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="livery-lines"><div class="line-yellow"></div><div class="line-white"></div><div class="line-blue"></div></div>
+    <div class="footer-content"><p>&copy; 2025 Protezione Civile Toscolano Maderno | IT: Matteo Podavini</p></div>
+</footer>
+
+<script>
+    const infraIps = ['2', '3', '200', '201', '230', '231'];
+    const defaultNames = { '2': 'Microtik Trasmitter', '3': 'Microtik Receiver', '200': 'Tenda Trasmitter', '201': 'Tenda Receiver', '230': 'Ponte Trasmitter', '231': 'Ponte Receiver' };
+    const infraGrid = document.getElementById('infraGrid');
+    infraIps.forEach(ip => {
+        infraGrid.innerHTML += `<div class="led-item"><div id="led-${ip}" class="led-bulb"></div><b>${defaultNames[ip]}</b><span style="font-size:0.7em;">.1.${ip}</span></div>`;
+    });
+
+    async function comanda(action, ip, pin, ledId, btnElement) {
+        const ledElement = document.getElementById(ledId);
+        const url = `http://192.168.191.${ip}/cgi-bin/output?username=admin&password=Adminadmin01&action=${action}&pin=${pin}`;
+        const blinkClass = action === 'on' ? 'blink-on' : 'blink-off';
+        btnElement.classList.add(blinkClass); btnElement.disabled = true; ledElement.textContent = "INVIO...";
+        try {
+            await fetch(url, { mode: 'no-cors' });
+            setTimeout(() => {
+                btnElement.classList.remove(blinkClass); btnElement.disabled = false;
+                ledElement.textContent = action === 'on' ? "ATTIVO (ON)" : "DISATTIVO (OFF)";
+                ledElement.className = "device-status-indicator " + (action === 'on' ? "status-on-active" : "status-off-active");
+            }, 3000);
+        } catch (e) {
+            btnElement.classList.remove(blinkClass); btnElement.disabled = false;
+            ledElement.textContent = "ERRORE INVIO"; ledElement.className = "device-status-indicator status-error";
+        }
+    }
+
+    function toggleTeltonikaIO(a, i, b) { comanda(a, i, 'relay', `indicator-${i}`, b); }
+    function toggleTeltonikaOC(a, i, b) { comanda(a, i, 'oc', `indicator-oc-${i}`, b); }
+    function apriIndirizzo(s) { window.open('http://192.168.191.' + s, '_blank'); }
+    function apriPortaManuale(p) { 
+        let ip = document.getElementById('ipManualeLibero').value.trim(); 
+        if(!ip) return alert("Inserire IP base!"); window.open('http://' + ip + ":" + p, '_blank'); 
+    }
+
+    async function checkPing(fullIp, elementId, isLed = false) {
+        const el = document.getElementById(elementId); if(!el) return;
+        try {
+            const c = new AbortController(); setTimeout(() => c.abort(), 1200);
+            await fetch(`http://${fullIp}`, { mode: 'no-cors', method: 'HEAD', signal: c.signal });
+            if(isLed) el.className = "led-bulb status-online";
+            else { el.textContent = "ONLINE"; el.style.backgroundColor = "var(--pc-green)"; el.style.color="white"; }
+        } catch {
+            if(isLed) el.className = "led-bulb status-offline";
+            else { el.textContent = "OFFLINE"; el.style.backgroundColor = "var(--pc-red)"; el.style.color="white"; }
+        }
+    }
+
+    const start = () => {
+        devices.forEach(d => { if(d.ip) checkPing(`192.168.191.${d.ip}`, `ping-indicator-${d.ip}`); });
+        infraIps.forEach(ip => checkPing(`192.168.1.${ip}`, `led-${ip}`, true));
+    };
+    start(); setInterval(start, 15000);
+
+    function checkIOStatusGrafico(ip) {
+        const banner = document.createElement('div');
+        banner.id = "banner-tecnico";
+        banner.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; display:flex; align-items:center; justify-content:center; color:white; backdrop-filter:blur(5px);";
+        banner.innerHTML = `<div style="background:white; color:#333; padding:30px; border-radius:25px; max-width:450px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+            <h2 style="color:var(--pc-red); margin-top:0;">⚠️ ACCESSO PROTETTO</h2>
+            <p>Reindirizzamento verso l'interfaccia I/O di:<br><b>192.168.191.${ip}</b></p>
+            <div style="background:#fff3cd; padding:15px; border-radius:12px; margin:20px 0; font-size:0.9em; text-align:left; border-left:5px solid #ff9900;">
+                • Richiesta autenticazione ADMIN.<br>• Solo per personale tecnico autorizzato.
+            </div>
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" style="background:var(--pc-green); color:white; border:none; padding:12px 30px; border-radius:10px; cursor:pointer; font-weight:bold;">PROCEDI</button>
+                <button onclick="document.getElementById('banner-tecnico').remove();" style="background:#666; color:white; border:none; padding:12px 30px; border-radius:10px; cursor:pointer;">ANNULLA</button>
+            </div>
+        </div>`;
+        document.body.appendChild(banner);
+    }
+
+        function apriSupporto() {
+        const supportWin = window.open("", "_blank", "width=550,height=700");
+        const formspreeID = "mjknpnvw"; 
+
+        supportWin.document.write(`
+            <!DOCTYPE html>
+            <html lang="it">
+            <head>
+                <meta charset="UTF-8">
+                <title>Supporto Tecnico - Protezione Civile TM</title>
+                <style>
+                    body { background: #002d5a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+                    .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 0 0 30px 0; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); text-align: center; width: 90%; max-width: 500px; overflow: hidden; }
+                    .card-livery { display: flex; flex-direction: column; width: 100%; margin-bottom: 20px; }
+                    .l-yellow { background: #ff9900; height: 10px; }
+                    .l-white { background: #ffffff; height: 10px; }
+                    .l-blue { background: #0056b3; height: 10px; }
+                    h1 { color: #ff9900; text-transform: uppercase; font-size: 1.5em; margin: 20px; }
+                    form { display: flex; flex-direction: column; gap: 15px; padding: 0 30px; text-align: left; }
+                    label { font-weight: bold; font-size: 0.85em; color: #eef2f5; text-transform: uppercase; }
+                    input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: none; background: rgba(255,255,255,0.95); font-family: inherit; font-size: 1em; color: #333; box-sizing: border-box; }
+                    button { background: #ff9900; color: #002d5a; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 1.1em; text-transform: uppercase; width: 100%; }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="card-livery"><div class="l-yellow"></div><div class="l-white"></div><div class="l-blue"></div></div>
+                    <h1>Richiedi Supporto IT</h1>
+                    <form action="formspree.io{formspreeID}" method="POST">
+                        <label>Richiedente:</label>
+                        <input type="text" name="richiedente" placeholder="Nome e Cognome" required>
+                        
+                        <label>Email per Risposta:</label>
+                        <input type="email" name="email" placeholder="latua@email.it" required>
+                        
+                        <label>Oggetto:</label>
+                        <input type="text" name="richiesta" placeholder="Oggetto della segnalazione" required>
+                        
+                        <label>Dettaglio Richiesta:</label>
+                        <textarea name="message" rows="4" placeholder="Descrivi il problema..." required></textarea>
+                        
+                        <!-- Questa riga dice a Formspree di andare su una pagina web reale dopo l'invio -->
+                        <input type="hidden" name="_next" value="formspree.io">
+                        <input type="hidden" name="_subject" value="Supporto Dashboard PC 2025">
+                        
+                        <button type="submit">Invia Segnalazione</button>
+                    </form>
+                    <div style="margin-top:20px; font-weight: bold; color: #ff9900; font-size:0.8em;">© 2025 IT DEPARTMENT - M. PODAVINI</div>
+                </div>
+            </body>
+            </html>
+        `);
+        supportWin.document.close();
+    }
+
+
+</script>
+</body>
+</html>
