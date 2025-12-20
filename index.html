@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+    <script>
+    // Imposta qui la tua password
+    const passwordSegreta = "PC2025TM"; 
+    
+    let accesso = sessionStorage.getItem("autorizzato");
+
+    if (accesso !== "true") {
+        let inserita = prompt("Accesso Riservato - Protezione Civile TM\nInserire la Password Operativa:");
+        if (inserita === passwordSegreta) {
+            sessionStorage.setItem("autorizzato", "true");
+        } else {
+            alert("Password Errata! Accesso negato.");
+            window.location.href = "https://www.google.it"; // Reindirizza gli intrusi
+        }
+    }
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeviCe Protezione Civile TM - 2025</title>
