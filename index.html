@@ -50,9 +50,14 @@
         .line-white { background-color: #ffffff; height: 6px; }
         .line-blue { background-color: var(--livery-blue); height: 6px; }
         
+       /* ISTRUZIONI */
         .instructions-box { background: #ffffff; border-left: 8px solid var(--pc-orange); border-radius: 12px; margin: 20px auto; padding: 15px 25px; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: left; }
         .instructions-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 15px; padding-bottom: 8px; }
         .instructions-header h3 { margin: 0; color: var(--pc-blue); font-size: 1.2em; text-transform: uppercase; }
+        .instructions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 10px; }
+        .instruction-item { display: flex; align-items: flex-start; gap: 12px; font-size: 0.85em; color: #555; }
+        .inst-icon { font-size: 1.4em; background: #f8f9fa; padding: 10px; border-radius: 10px; min-width: 40px; text-align: center; }
+
         
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1600px; margin: 30px auto; }
         .device-card { display: flex; flex-direction: column; gap: 10px; background: #ffffff; padding: 20px; border-radius: 15px; border: 1px solid #000; min-height: 680px; justify-content: space-between; }
@@ -83,16 +88,52 @@
 <div class="container">
     <div class="instructions-box">
         <div class="instructions-header">
-            <h3>Pannello Operativo Digitale <span style="font-size: 0.6em; background: var(--pc-blue); color: white; padding: 2px 8px; border-radius: 10px;">v4.5.25</span></h3>
-            <button onclick="apriSupporto()" style="background:var(--pc-orange); color:var(--pc-blue); border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">🛠️ RICHIEDI SUPPORTO</button>
+             <h3>Pannello Operativo Digitale <span style="font-size: 0.6em; background: var(--pc-blue); color: white; padding: 2px 8px; border-radius: 10px;">v4.5.25</span></h3>
+            <button onclick="apriSupporto()" style="background:var(--pc-orange); color:var(--pc-blue); border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">🛠️ RICHIEDI SUPPORTO</button>
+        </div>
+        <div class="instructions-grid">
+            <div class="instruction-item"><span class="inst-icon" style="color:#0056b3;">📡</span><div><strong>RETE SINCRONIZZATA</strong><span>Aggiornamento ogni 15s su tutti i terminali.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon" style="color:#ff9900;">⚡</span><div><strong>CONTROLLO RELÈ</strong><span>Invio comandi con feedback visivo a LED.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon" style="color:#28a745;">⚙️</span><div><strong>SUPPORTO</strong><span>Area segnalazione guasti e assistenza IT.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon" style="color:#d32f2f;">📊</span><div><strong>DIAGNOSTICA</strong><span>Monitoraggio ingressi e sensori I/O.</span></div></div>
         </div>
     </div>
 
     <div class="grid-container" id="devicesGrid"></div>
 
-    <div class="section-card">
+        <div class="section-card">
         <h4>📡 Monitoraggio Infrastruttura Ethernet Locale</h4>
         <div class="led-grid" id="infraGrid"></div>
+    </div>
+
+    <div class="section-card">
+        <h4>⌨ Inoltro Porte e Accesso Manuale</h4>
+        <div style="display:flex; justify-content:center; margin-bottom:25px;">
+            <input type="text" id="ipManualeLibero" class="device-name-input" placeholder="IP Destinazione (es. 192.168.1.XX)" style="max-width:450px; border:2px solid var(--pc-orange);">
+        </div>
+        <div class="port-grid">
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="TENDA TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8082')">PORTA 8082</button>
+                    <button onclick="apriPortaManuale('8083')">PORTA 8083</button>
+                </div>
+            </div>
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="MICROTIK TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8085')">PORTA 8085</button>
+                    <button onclick="apriPortaManuale('8086')">PORTA 8086</button>
+                </div>
+            </div>
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="MICROLINK TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8088')">PORTA 8088</button>
+                    <button onclick="apriPortaManuale('8089')">PORTA 8089</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
