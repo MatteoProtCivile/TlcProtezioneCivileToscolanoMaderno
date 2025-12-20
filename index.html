@@ -288,12 +288,15 @@
     }
 
 function apriSupporto() {
-    // Calcola le dimensioni per lo schermo intero
-    const width = window.screen.availWidth;
-    const height = window.screen.availHeight;
+    const width = 650;
+    const height = 800;
+    const left = (window.screen.width / 2) - (width / 2);
+    const top = (window.screen.height / 2) - (height / 2);
     
-    const supportWin = window.open("", "_blank", `width=${width},height=${height},left=0,top=0`);
-    const formspreeID = "https://formspree.io/f/mjknnney"; 
+    const supportWin = window.open("", "_blank", `width=${width},height=${height},left=${left},top=${top}`);
+    
+    // 1. CORREZIONE: Qui va solo l'ID, non l'intero URL
+    const formID = "mjknnney"; 
 
     supportWin.document.write(`
         <!DOCTYPE html>
@@ -320,7 +323,9 @@ function apriSupporto() {
             <div class="card">
                 <div class="card-livery"><div class="l-yellow"></div><div class="l-white"></div><div class="l-blue"></div></div>
                 <h1>Richiedi Supporto IT</h1>
-                <form action="formspree.io{formspreeID}" method="POST">
+                
+                <!-- 2. CORREZIONE: URL completo e pulito inserito qui direttamente -->
+                <form action="formspree.io{formID}" method="POST">
                     <label>Richiedente (Nome e Cognome):</label>
                     <input type="text" name="richiedente" placeholder="Inserisci il tuo nome" required>
                     
@@ -341,6 +346,7 @@ function apriSupporto() {
     `);
     supportWin.document.close();
 }
+
 
 
 
