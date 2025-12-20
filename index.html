@@ -36,8 +36,6 @@
         .device-card button, .section-card button { padding: 10px; font-size: 0.85em; border-radius: 6px; border: 1px solid #d1d9e6; background-color: #f8fafc; font-weight: 600; cursor: pointer; transition: 0.3s; user-select: none; }
         .device-status-indicator { padding: 10px; font-size: 0.85em; font-weight: bold; border-radius: 6px; text-align: center; background-color: #bdc3c7; color: #333; }
         
-        /* PORT FORWARDING BOX */
-        .port-section { background: #ffffff; padding: 30px; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 20px; }
         .port-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .port-card { background: #f8fafc; padding: 20px; border-radius: 15px; border-top: 4px solid var(--pc-orange); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
         .port-label-input { width: 100%; padding: 8px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #cbd5e0; text-align: center; font-weight: bold; color: var(--pc-blue); font-size: 0.8em; }
@@ -65,6 +63,7 @@
 </head>
 <body>
 <div class="livery-lines"><div class="line-yellow"></div><div class="line-white"></div><div class="line-blue"></div></div>
+<!-- Logo corretto senza cartella -->
 <img src="golfo_tecno.png" alt="Logo" class="logo-full-width">
 
 <div class="container">
@@ -98,6 +97,7 @@
                         <div id="ping-indicator-${dev.ip}" class="device-status-indicator">VERIFICA...</div>
                         <button onclick="checkIOStatusGrafico('${dev.ip}')">📊 STATO INGRESSI</button>
                         <input type="text" class="device-name-input" value="${dev.nome}">
+                        <!-- Immagine terminale corretta senza cartella -->
                         <img src="telt.jpg" style="max-width:140px; margin:auto;">
                         <button onclick="toggleTeltonikaIO('on', '${dev.ip}', this)">| ATTIVA RELÈ_1</button>
                         <button onclick="toggleTeltonikaIO('off', '${dev.ip}', this)">⭘ DISATTIVA RELÈ_1</button>
@@ -225,19 +225,15 @@
         document.body.appendChild(banner);
     }
 
-        function apriSupporto() {
-        const supportWin = window.open("", "_blank", "width=550,height=700");
-        const formspreeID = "mjknpnvw"; 
-
+    function apriSupporto() {
+        const supportWin = window.open("", "_blank", "width=550,height=750");
         supportWin.document.write(`
-            <!DOCTYPE html>
-            <html lang="it">
+            <html>
             <head>
-                <meta charset="UTF-8">
                 <title>Supporto Tecnico - Protezione Civile TM</title>
                 <style>
                     body { background: #002d5a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-                    .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 0 0 30px 0; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); text-align: center; width: 90%; max-width: 500px; overflow: hidden; }
+                    .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 0 0 30px 0; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); width: 90%; max-width: 500px; overflow: hidden; }
                     .card-livery { display: flex; flex-direction: column; width: 100%; margin-bottom: 20px; }
                     .l-yellow { background: #ff9900; height: 10px; }
                     .l-white { background: #ffffff; height: 10px; }
@@ -247,28 +243,25 @@
                     label { font-weight: bold; font-size: 0.85em; color: #eef2f5; text-transform: uppercase; }
                     input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: none; background: rgba(255,255,255,0.95); font-family: inherit; font-size: 1em; color: #333; box-sizing: border-box; }
                     button { background: #ff9900; color: #002d5a; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 1.1em; text-transform: uppercase; width: 100%; }
+                    button:hover { background: #e68a00; transform: translateY(-2px); }
                 </style>
             </head>
             <body>
                 <div class="card">
                     <div class="card-livery"><div class="l-yellow"></div><div class="l-white"></div><div class="l-blue"></div></div>
                     <h1>Richiedi Supporto IT</h1>
-                    <form action="formspree.io{formspreeID}" method="POST">
+                    <form action="formspree.io" method="POST">
                         <label>Richiedente:</label>
                         <input type="text" name="richiedente" placeholder="Nome e Cognome" required>
-                        
                         <label>Email per Risposta:</label>
                         <input type="email" name="email" placeholder="latua@email.it" required>
-                        
                         <label>Oggetto:</label>
                         <input type="text" name="richiesta" placeholder="Oggetto della segnalazione" required>
-                        
                         <label>Dettaglio Richiesta:</label>
                         <textarea name="message" rows="4" placeholder="Descrivi il problema..." required></textarea>
                         
-                        <!-- Questa riga dice a Formspree di andare su una pagina web reale dopo l'invio -->
                         <input type="hidden" name="_next" value="formspree.io">
-                        <input type="hidden" name="_subject" value="Supporto Dashboard PC 2025">
+                        <input type="hidden" name="_subject" value="Ticket Supporto Dashboard 2025">
                         
                         <button type="submit">Invia Segnalazione</button>
                     </form>
@@ -279,8 +272,6 @@
         `);
         supportWin.document.close();
     }
-
-
 </script>
 </body>
 </html>
