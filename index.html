@@ -244,14 +244,17 @@
     }
 
     function apriSupporto() {
-        const supportWin = window.open("", "_blank", "width=550,height=750");
+        const supportWin = window.open("", "_blank", "width=550,height=700");
+        
         supportWin.document.write(`
-            <html>
+            <!DOCTYPE html>
+            <html lang="it">
             <head>
+                <meta charset="UTF-8">
                 <title>Supporto Tecnico - Protezione Civile TM</title>
                 <style>
                     body { background: #002d5a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-                    .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 0 0 30px 0; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); width: 90%; max-width: 500px; overflow: hidden; }
+                    .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 0 0 30px 0; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); text-align: center; width: 90%; max-width: 500px; overflow: hidden; }
                     .card-livery { display: flex; flex-direction: column; width: 100%; margin-bottom: 20px; }
                     .l-yellow { background: #ff9900; height: 10px; }
                     .l-white { background: #ffffff; height: 10px; }
@@ -260,6 +263,7 @@
                     form { display: flex; flex-direction: column; gap: 15px; padding: 0 30px; text-align: left; }
                     label { font-weight: bold; font-size: 0.85em; color: #eef2f5; text-transform: uppercase; }
                     input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: none; background: rgba(255,255,255,0.95); font-family: inherit; font-size: 1em; color: #333; box-sizing: border-box; }
+                    input:focus, textarea:focus { outline: 3px solid #ff9900; }
                     button { background: #ff9900; color: #002d5a; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 1.1em; text-transform: uppercase; width: 100%; }
                     button:hover { background: #e68a00; transform: translateY(-2px); }
                 </style>
@@ -269,17 +273,19 @@
                     <div class="card-livery"><div class="l-yellow"></div><div class="l-white"></div><div class="l-blue"></div></div>
                     <h1>Richiedi Supporto IT</h1>
                     <form action="formspree.io" method="POST">
-                        <label>Richiedente:</label>
-                        <input type="text" name="richiedente" placeholder="Nome e Cognome" required>
-                        <label>Email per Risposta:</label>
-                        <input type="email" name="email" placeholder="latua@email.it" required>
-                        <label>Oggetto:</label>
-                        <input type="text" name="richiesta" placeholder="Oggetto della segnalazione" required>
-                        <label>Dettaglio Richiesta:</label>
-                        <textarea name="message" rows="4" placeholder="Descrivi il problema..." required></textarea>
                         
+                        <label>Richiedente (Nome e Cognome):</label>
+                        <input type="text" name="richiedente" placeholder="Esempio: Mario Rossi" required>
+                        
+                        <label>Oggetto della Richiesta:</label>
+                        <input type="text" name="richiesta" placeholder="Es: Problema RUT_955 (.10)" required>
+                        
+                        <label>Descrizione Dettagliata:</label>
+                        <textarea name="message" rows="5" placeholder="Descrivi il problema riscontrato..." required></textarea>
+                        
+                        <!-- Configurazione Invio -->
+                        <input type="hidden" name="_subject" value="Supporto Dashboard 2025 - Segnalazione">
                         <input type="hidden" name="_next" value="formspree.io">
-                        <input type="hidden" name="_subject" value="Ticket Supporto Dashboard 2025">
                         
                         <button type="submit">Invia Segnalazione</button>
                     </form>
@@ -290,6 +296,7 @@
         `);
         supportWin.document.close();
     }
+
 </script>
 </body>
 </html>
