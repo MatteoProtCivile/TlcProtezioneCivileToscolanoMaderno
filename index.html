@@ -7,21 +7,59 @@
        ========================================== */
     const usaPassword = false;          
     const passwordSegreta = "PC2025TM"; 
-    const sitoInManutenzione = false; 
+    const sitoInManutenzione = false; // <-- METTI TRUE PER BLOCCARE IL SITO
 
+    /* 1. CONTROLLO MANUTENZIONE (Deve essere il primo) */
     if (sitoInManutenzione) {
-        window.stop();
+        window.stop(); // Ferma il caricamento degli altri elementi
         document.documentElement.innerHTML = `
-        <div style="background:radial-gradient(circle,#003d7a,#001a33);height:100vh;display:flex;justify-content:center;align-items:center;color:white;font-family:sans-serif;text-align:center;">
-            <div><h1>⚙️ Sistema in Aggiornamento</h1><p>Manutenzione programmata in corso.</p></div>
-        </div>`;
-        throw new Error("Manutenzione attiva");
+        <!DOCTYPE html>
+        <html lang="it">
+        <head>
+            <meta charset="UTF-8">
+            <title>SISTEMA IN MANUTENZIONE - PC TM</title>
+            <style>
+                body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+                .bg { background: radial-gradient(circle at center, #003d7a 0%, #001a33 100%); height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
+                .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); padding: 60px; border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; max-width: 600px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); animation: fadeIn 1s ease-out; }
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+                .livery { display: flex; justify-content: center; gap: 5px; margin-bottom: 30px; }
+                .l-y { width: 40px; height: 6px; background: #ff9900; border-radius: 3px; }
+                .l-w { width: 40px; height: 6px; background: #ffffff; border-radius: 3px; }
+                .l-b { width: 40px; height: 6px; background: #0056b3; border-radius: 3px; }
+                .icon { font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 15px #ff9900); }
+                h1 { color: #ff9900; text-transform: uppercase; letter-spacing: 3px; margin: 0 0 15px 0; font-size: 2em; }
+                p { font-size: 1.2em; line-height: 1.6; color: #eef2f5; margin-bottom: 30px; }
+                .loader { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #ff9900; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                .badge { display: inline-block; padding: 8px 20px; background: rgba(255, 153, 0, 0.15); color: #ff9900; border-radius: 20px; font-weight: bold; font-size: 0.9em; text-transform: uppercase; }
+            </style>
+        </head>
+        <body>
+            <div class="bg">
+                <div class="card">
+                    <div class="livery"><div class="l-y"></div><div class="l-w"></div><div class="l-b"></div></div>
+                    <div class="icon">⚙️</div>
+                    <h1>Sistema in Aggiornamento</h1>
+                    <p>Intervento di manutenzione programmata sull'infrastruttura IT.<br>Il monitoraggio riprenderà a breve.</p>
+                    <div class="loader"></div>
+                    <div class="badge">Ripristino previsto a breve</div>
+                </div>
+            </div>
+        </body>
+        </html>`;
+        throw new Error("Manutenzione attiva"); // Blocca script successivi
     }
 
+    /* 2. LOGICA PASSWORD (Viene eseguita solo se manutenzione è false) */
     if (usaPassword && sessionStorage.getItem("autorizzato") !== "true") {
         let inserita = prompt("SISTEMA RISERVATO - PROTEZIONE CIVILE TM\nInserire la Password Operativa:");
-        if (inserita === passwordSegreta) { sessionStorage.setItem("autorizzato", "true"); } 
-        else { alert("Password Errata!"); window.location.href = "https://www.google.it"; }
+        if (inserita === passwordSegreta) {
+            sessionStorage.setItem("autorizzato", "true");
+        } else {
+            alert("Password Errata!");
+            window.location.href = "https://www.google.it";
+        }
     }
 </script>
 
@@ -35,21 +73,25 @@
             --pc-red: #d32f2f; --pc-bg: #eef2f5; --livery-blue: #0056b3;
             --status-on: #28a745; --status-off: #d32f2f;
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--pc-bg); margin: 0; text-align: center; }
+
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--pc-bg); color: #2c3e50; margin: 0; padding: 0; text-align: center; }
         .container { width: 95%; margin: auto; }
         .logo-full-width { width: 100%; height: auto; display: block; }
+        
         .livery-lines { display: flex; flex-direction: column; width: 100%; }
         .line-yellow { background-color: var(--pc-orange); height: 6px; }
         .line-white { background-color: #ffffff; height: 6px; }
         .line-blue { background-color: var(--livery-blue); height: 6px; }
-         /* ISTRUZIONI */
+
+        /* ISTRUZIONI */
         .instructions-box { background: #ffffff; border-left: 8px solid var(--pc-orange); border-radius: 12px; margin: 20px auto; padding: 15px 25px; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: left; }
         .instructions-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 15px; padding-bottom: 8px; }
         .instructions-header h3 { margin: 0; color: var(--pc-blue); font-size: 1.2em; text-transform: uppercase; }
         .instructions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 10px; }
         .instruction-item { display: flex; align-items: flex-start; gap: 12px; font-size: 0.85em; color: #555; }
         .inst-icon { font-size: 1.4em; background: #f8f9fa; padding: 10px; border-radius: 10px; min-width: 40px; text-align: center; }
-  /* DEVICE CARD */
+
+        /* DEVICE CARD */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1600px; margin: 30px auto; align-items: stretch; }
         .device-card { display: flex; flex-direction: column; gap: 10px; background: #ffffff; padding: 20px; border-radius: 15px; border: 1px solid #000; box-shadow: 0 4px 6px rgba(0,0,0,0.05); min-height: 680px; justify-content: space-between; transition: 0.3s; }
         .device-name-input { width: 100%; height: 42px; border: 2px solid #edf2f7; border-radius: 8px; text-align: center; font-weight: 800; color: var(--pc-blue); background: #f8fafc; }
@@ -84,13 +126,12 @@
     </style>
 </head>
 <body>
-
 <div class="livery-lines"><div class="line-yellow"></div><div class="line-white"></div><div class="line-blue"></div></div>
 <img src="golfo_tecno.png" alt="Logo" class="logo-full-width">
 
 <div class="container">
     <div class="instructions-box">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="instructions-header">
             <h3>Pannello Operativo Digitale <span style="font-size: 0.6em; background: var(--pc-blue); color: white; padding: 2px 8px; border-radius: 10px;">v4.5.25</span></h3>
             <button onclick="apriSupporto()" style="background:var(--pc-orange); color:var(--pc-blue); border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">🛠️ RICHIEDI SUPPORTO</button>
         </div>
@@ -132,12 +173,15 @@
                 }
             });
         </script>
+<!-- ... (Il tuo codice HTML/CSS della parte 2 e inizio parte 3 rimane invariato fino a qui) ... -->
+    </div>
 
-    <div class="section-card" style="background:#fff; padding:25px; border-radius:20px; margin-top:30px;">
-        <h4>📡 Monitoraggio Infrastruttura Ethernet</h4>
+    <div class="section-card">
+        <h4>📡 Monitoraggio Infrastruttura Ethernet Locale</h4>
         <div class="led-grid" id="infraGrid"></div>
     </div>
-<div class="section-card">
+
+    <div class="section-card">
         <h4>⌨ Inoltro Porte e Accesso Manuale</h4>
         <div style="display:flex; justify-content:center; margin-bottom:25px;">
             <input type="text" id="ipManualeLibero" class="device-name-input" placeholder="IP Destinazione (es. 192.168.1.XX)" style="max-width:450px; border:2px solid var(--pc-orange);">
@@ -169,117 +213,113 @@
 </div>
 
 <footer>
-    <p>&copy; 2025 Protezione Civile Toscolano Maderno | IT: Matteo Podavini</p>
+    <div class="livery-lines"><div class="line-yellow"></div><div class="line-white"></div><div class="line-blue"></div></div>
+    <div class="footer-content"><p>&copy; 2025 Protezione Civile Toscolano Maderno | IT: Matteo Podavini</p></div>
 </footer>
 
 <script>
-    /* CONFIGURAZIONE NAS E DISPOSITIVI */
-    const NAS_URL = 'http://IP_TAILSCALE_DEL_NAS/sync/update.php'; 
-    const devices = [
-        { ip: '10', nome: 'RUT_955B (.10)' }, { ip: '12', nome: 'RUT_955B (.12)' },
-        { ip: '13', nome: 'PONTE RADIO (.13)' }, { ip: '14', nome: 'RUT_956A' },
-        { ip: '15', nome: 'RUT_955B (.15)' },
-        { ip: null, nome: 'SLOT LIBERO' }, { ip: null, nome: 'SLOT LIBERO' }
-    ];
     const infraIps = ['2', '3', '200', '201', '230', '231'];
-    const defaultNames = { '2': 'Microtik TX', '3': 'Microtik RX', '200': 'Tenda TX', '201': 'Tenda RX', '230': 'Ponte TX', '231': 'Ponte RX' };
-
-    /* GENERAZIONE INTERFACCIA */
-    const grid = document.getElementById('devicesGrid');
-    devices.forEach(dev => {
-        if (dev.ip) {
-            grid.innerHTML += `
-            <div class="device-card">
-                <button onclick="apriIndirizzo('${dev.ip}')">🌐 ACCESSO .${dev.ip}</button>
-                <div id="ping-indicator-${dev.ip}" class="device-status-indicator">VERIFICA...</div>
-                <button onclick="checkIOStatusGrafico('${dev.ip}')">📊 INGRESSI</button>
-                <input type="text" class="device-name-input" value="${dev.nome}">
-                <img src="telt.jpg" style="max-width:120px; margin:auto;">
-                <button onclick="toggleTeltonikaIO('on', '${dev.ip}', this)">| ON RELÈ 1</button>
-                <button onclick="toggleTeltonikaIO('off', '${dev.ip}', this)">⭘ OFF RELÈ 1</button>
-                <div id="indicator-${dev.ip}" class="device-status-indicator">STATO RELÈ 1</div>
-            </div>`;
-        } else {
-            grid.innerHTML += `<div class="device-card" style="border:2px dashed #ccc; opacity:0.5; justify-content:center;">➕ LIBERO</div>`;
-        }
-    });
-
+    const defaultNames = { '2': 'Microtik Trasmitter', '3': 'Microtik Receiver', '200': 'Tenda Trasmitter', '201': 'Tenda Receiver', '230': 'Ponte Trasmitter', '231': 'Ponte Receiver' };
     const infraGrid = document.getElementById('infraGrid');
     infraIps.forEach(ip => {
-        infraGrid.innerHTML += `<div class="led-item"><div id="led-${ip}" class="led-bulb"></div><b>${defaultNames[ip]}</b><br><small>.1.${ip}</small></div>`;
+        infraGrid.innerHTML += `<div class="led-item"><div id="led-${ip}" class="led-bulb"></div><b>${defaultNames[ip]}</b><span style="font-size:0.7em;">.1.${ip}</span></div>`;
     });
 
-    /* LOGICA SCRIPT 1: INVIO DATI AL NAS */
-    async function syncNasStatus(ip, action) {
-        try {
-            await fetch(NAS_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ device: ip, status: action.toUpperCase(), timestamp: Date.now() })
-            });
-        } catch (e) { console.error("Errore NAS Sync:", e); }
-    }
-
-    /* LOGICA SCRIPT 2: POLLING DAL NAS (Ogni 3s) */
-    setInterval(() => {
-        fetch(NAS_URL)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(item => {
-                    const el = document.getElementById(`indicator-${item.device}`);
-                    if (el) {
-                        el.textContent = item.status === "ON" ? "ATTIVO (ON)" : "DISATTIVO (OFF)";
-                        el.className = `device-status-indicator ${item.status === "ON" ? "status-on-active" : "status-off-active"}`;
-                    }
-                });
-            }).catch(() => {});
-    }, 3000);
-
-    /* COMANDO RELÈ */
-    async function comanda(action, ip, pin, ledId, btn) {
-        const led = document.getElementById(ledId);
+    async function comanda(action, ip, pin, ledId, btnElement) {
+        // Questa funzione comanda usa fetch con no-cors, che potrebbe comunque fallire su github.io
+        const ledElement = document.getElementById(ledId);
         const url = `http://192.168.191.${ip}/cgi-bin/output?username=admin&password=Adminadmin01&action=${action}&pin=${pin}`;
-        btn.classList.add(action === 'on' ? 'blink-on' : 'blink-off');
-        btn.disabled = true;
-        
+        const blinkClass = action === 'on' ? 'blink-on' : 'blink-off';
+        btnElement.classList.add(blinkClass); btnElement.disabled = true; ledElement.textContent = "INVIO...";
         try {
-            await fetch(url, { mode: 'no-cors' }); // Comando al Router
-            await syncNasStatus(ip, action);      // SCRIPT 1: Sync al NAS
-            setTimeout(() => { btn.classList.remove('blink-on', 'blink-off'); btn.disabled = false; }, 2000);
-        } catch (e) { 
-            led.textContent = "ERRORE"; 
-            btn.disabled = false;
+            // L'uso di no-cors qui significa che il browser non può leggere la risposta, ma invia il comando.
+            // Se il comando arriva a destinazione, l'operazione ha successo.
+            await fetch(url, { mode: 'no-cors' }); 
+            setTimeout(() => {
+                btnElement.classList.remove(blinkClass); btnElement.disabled = false;
+                ledElement.textContent = action === 'on' ? "ATTIVO (ON)" : "DISATTIVO (OFF)";
+                ledElement.className = "device-status-indicator " + (action === 'on' ? "status-on-active" : "status-off-active");
+            }, 3000);
+        } catch (e) {
+            btnElement.classList.remove(blinkClass); btnElement.disabled = false;
+            ledElement.textContent = "ERRORE INVIO"; ledElement.className = "device-status-indicator status-error";
         }
     }
 
     function toggleTeltonikaIO(a, i, b) { comanda(a, i, 'relay', `indicator-${i}`, b); }
+    function toggleTeltonikaOC(a, i, b) { comanda(a, i, 'oc', `indicator-oc-${i}`, b); }
     function apriIndirizzo(s) { window.open('http://192.168.191.' + s, '_blank'); }
-
-    /* PING VISIVO */
-    function checkPing(fullIp, elementId, isLed = false) {
-        const el = document.getElementById(elementId);
-        const img = new Image();
-        const timeout = setTimeout(() => {
-            if (isLed) el.className = "led-bulb status-offline";
-            else { el.textContent = "OFFLINE"; el.style.background = "var(--pc-red)"; el.style.color = "white"; }
-        }, 2500);
-        img.onload = img.onerror = () => {
-            clearTimeout(timeout);
-            if (isLed) el.className = "led-bulb status-online";
-            else { el.textContent = "ONLINE"; el.style.background = "var(--pc-green)"; el.style.color = "white"; }
-        };
-        img.src = `http://${fullIp}/favicon.ico?t=${Date.now()}`;
+    function apriPortaManuale(p) { 
+        let ip = document.getElementById('ipManualeLibero').value.trim(); 
+        if(!ip) return alert("Inserire IP base!"); window.open('http://' + ip + ":" + p, '_blank'); 
     }
 
-    const startPing = () => {
+    /**
+     * FUNZIONE CHECKPING MODIFICATA:
+     * Utilizza un "trucco" con l'immagine per tentare di bypassare i blocchi CORS diretti.
+     * È ancora fortemente limitata dalle policy di sicurezza del browser.
+     */
+    function checkPing(fullIp, elementId, isLed = false) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        // Reset visuale mentre si controlla
+        if (isLed) {
+            el.className = "led-bulb";
+        } else {
+            el.textContent = "VERIFICA...";
+            el.style.backgroundColor = "#bdc3c7";
+        }
+
+        const img = new Image();
+        const timeout = setTimeout(() => {
+            img.onerror = null; 
+            img.onload = null;
+            if (isLed) el.className = "led-bulb status-offline";
+            else { el.textContent = "OFFLINE"; el.style.backgroundColor = "var(--pc-red)"; }
+        }, 2500); // Tempo di attesa ridotto a 2.5 secondi
+
+        img.onload = () => {
+            clearTimeout(timeout);
+            if (isLed) el.className = "led-bulb status-online";
+            else { el.textContent = "ONLINE"; el.style.backgroundColor = "var(--pc-green)"; }
+        };
+        
+        img.onerror = img.onload; // Se l'immagine viene caricata (onload) o fallisce con errore (onerror) ma ha comunque contattato l'IP, consideriamo il dispositivo vivo.
+
+        // Tentiamo di caricare un'immagine inesistente sulla porta 80 dell'IP di destinazione.
+        // Se la richiesta parte e ritorna un "qualcosa", onload/onerror viene chiamato.
+        img.src = `http://${fullIp}/favicon.ico?cachebust=` + new Date().getTime();
+    }
+
+
+    const start = () => {
+        // La funzione start() invoca la nuova logica checkPing()
         devices.forEach(d => { if(d.ip) checkPing(`192.168.191.${d.ip}`, `ping-indicator-${d.ip}`); });
         infraIps.forEach(ip => checkPing(`192.168.1.${ip}`, `led-${ip}`, true));
     };
-    startPing();
-    setInterval(startPing, 15000);
+    start(); 
+    // Manteniamo l'intervallo di 15 secondi
+    setInterval(start, 15000);
 
-      }
+    function checkIOStatusGrafico(ip) {
+        // ... (Questa funzione rimane invariata) ...
+        const banner = document.createElement('div');
+        banner.id = "banner-tecnico";
+        banner.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; display:flex; align-items:center; justify-content:center; color:white; backdrop-filter:blur(5px);";
+        banner.innerHTML = `<div style="background:white; color:#333; padding:30px; border-radius:25px; max-width:450px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+            <h2 style="color:var(--pc-red); margin-top:0;">⚠️ ACCESSO PROTETTO</h2>
+            <p>Reindirizzamento verso l'interfaccia I/O di:<br><b>192.168.191.${ip}</b></p>
+            <div style="background:#fff3cd; padding:15px; border-radius:12px; margin:20px 0; font-size:0.9em; text-align:left; border-left:5px solid #ff9900;">
+                • Richiesta autenticazione ADMIN.<br>• Solo per personale tecnico autorizzato.
+            </div>
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" style="background:var(--pc-green); color:white; border:none; padding:12px 30px; border-radius:10px; cursor:pointer; font-weight:bold;">PROCEDI</button>
+                <button onclick="document.getElementById('banner-tecnico').remove();" style="background:#666; color:white; border:none; padding:12px 30px; border-radius:10px; cursor:pointer;">ANNULLA</button>
+            </div>
+        </div>`;
+        document.body.appendChild(banner);
+    }
 
 
 
@@ -315,6 +355,20 @@ function apriSupporto() {
                 button:hover { background: #e68a00; transform: scale(1.02); }
             </style>
         </head>
+        fetch('http://IP_TAILSCALE_DEL_NAS/sync/update.php', {
+    method: 'POST',
+    body: JSON.stringify({ device: "pompa1", status: "ON", timestamp: Date.now() })
+});
+
+setInterval(() => {
+    fetch('http://IP_TAILSCALE_DEL_NAS/sync/update.php')
+        .then(res => res.json())
+        .then(data => {
+            console.log("Stato ricevuto dal NAS:", data);
+            // Qui aggiungi il codice per cambiare i colori/testi nella tua pagina
+        });
+}, 3000); // Controlla ogni 3 secondi
+
         <body>
             <div class="card">
                 <div class="card-livery"><div class="l-yellow"></div><div class="l-white"></div><div class="l-blue"></div></div>
@@ -338,13 +392,14 @@ function apriSupporto() {
                 <div style="margin-top:30px; font-weight: bold; color: #ff9900; font-size:0.9em; letter-spacing:1px;">© 2025 IT DEPARTMENT - M. PODAVINI</div>
             </div>
         </body>
-    }
+        </html>
+    `);
+    supportWin.document.close();
+}
 
-    function checkIOStatusGrafico(ip) {
-        if(confirm("Accedere alla diagnostica di 192.168.191." + ip + "?")) {
-            window.open(`http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1`, '_blank');
-        }
-    }
+
+
+
 </script>
 </body>
 </html>
