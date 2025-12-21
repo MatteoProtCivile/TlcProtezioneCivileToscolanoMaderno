@@ -134,13 +134,6 @@
         <div class="instructions-header">
             <h3>Pannello Operativo Digitale <span style="font-size: 0.6em; background: var(--pc-blue); color: white; padding: 2px 8px; border-radius: 10px;">v4.5.25</span></h3>
             <button onclick="apriSupporto()" style="background:var(--pc-orange); color:var(--pc-blue); border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">🛠️ RICHIEDI SUPPORTO</button>
-       <div class="container">
-    <div class="instructions-box">
-       <div class="container">
-    <div class="instructions-box">
-        <div class="instructions-header">
-            <h3>Pannello Operativo Digitale <span style="font-size: 0.6em; background: var(--pc-blue); color: white; padding: 2px 8px; border-radius: 10px;">v4.5.25</span></h3>
-            <button onclick="apriSupporto()" style="background:var(--pc-orange); color:var(--pc-blue); border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">🛠️ RICHIEDI SUPPORTO</button>
         </div>
         <div class="instructions-grid">
             <div class="instruction-item"><span class="inst-icon" style="color:#0056b3;">📡</span><div><strong>RETE SINCRONIZZATA</strong><span>Aggiornamento ogni 15s su tutti i terminali.</span></div></div>
@@ -149,8 +142,6 @@
             <div class="instruction-item"><span class="inst-icon" style="color:#d32f2f;">📊</span><div><strong>DIAGNOSTICA</strong><span>Monitoraggio ingressi e sensori I/O.</span></div></div>
         </div>
     </div>
-
-    <div class="grid-container" id="devicesGrid">
 
     <div class="grid-container" id="devicesGrid">
         <script>
@@ -320,7 +311,7 @@
             <h2 style="color:var(--pc-red); margin-top:0;">⚠️ ACCESSO PROTETTO</h2>
             <p>Reindirizzamento verso l'interfaccia I/O di:<br><b>192.168.191.${ip}</b></p>
             <div style="background:#fff3cd; padding:15px; border-radius:12px; margin:20px 0; font-size:0.9em; text-align:left; border-left:5px solid #ff9900;">
-                • Richiesta autenticazione ADMIN.<br>• Consigliato l'accesso a personale istruito e autorizzato
+                • Richiesta autenticazione ADMIN.<br>• Solo per personale tecnico autorizzato.
             </div>
             <div style="display:flex; gap:15px; justify-content:center;">
                 <button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" style="background:var(--pc-green); color:white; border:none; padding:12px 30px; border-radius:10px; cursor:pointer; font-weight:bold;">PROCEDI</button>
@@ -329,19 +320,7 @@
         </div>`;
         document.body.appendChild(banner);
     }
-fetch('http://IP_TAILSCALE_DEL_NAS/sync/update.php', {
-    method: 'POST',
-    body: JSON.stringify({ device: "pompa1", status: "ON", timestamp: Date.now() })
-});
 
-setInterval(() => {
-    fetch('http://IP_TAILSCALE_DEL_NAS/sync/update.php')
-        .then(res => res.json())
-        .then(data => {
-            console.log("Stato ricevuto dal NAS:", data);
-            // Qui aggiungi il codice per cambiare i colori/testi nella tua pagina
-        });
-}, 3000); // Controlla ogni 3 secondi
 
 
 function apriSupporto() {
@@ -376,8 +355,6 @@ function apriSupporto() {
                 button:hover { background: #e68a00; transform: scale(1.02); }
             </style>
         </head>
-        
-
         <body>
             <div class="card">
                 <div class="card-livery"><div class="l-yellow"></div><div class="l-white"></div><div class="l-blue"></div></div>
