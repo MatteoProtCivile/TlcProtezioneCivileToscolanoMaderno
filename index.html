@@ -320,7 +320,19 @@
         </div>`;
         document.body.appendChild(banner);
     }
+fetch('http://IP_TAILSCALE_DEL_NAS/sync/update.php', {
+    method: 'POST',
+    body: JSON.stringify({ device: "pompa1", status: "ON", timestamp: Date.now() })
+});
 
+setInterval(() => {
+    fetch('http://IP_TAILSCALE_DEL_NAS/sync/update.php')
+        .then(res => res.json())
+        .then(data => {
+            console.log("Stato ricevuto dal NAS:", data);
+            // Qui aggiungi il codice per cambiare i colori/testi nella tua pagina
+        });
+}, 3000); // Controlla ogni 3 secondi
 
 
 function apriSupporto() {
@@ -355,19 +367,7 @@ function apriSupporto() {
                 button:hover { background: #e68a00; transform: scale(1.02); }
             </style>
         </head>
-        fetch('http://IP_TAILSCALE_DEL_NAS/sync/update.php', {
-    method: 'POST',
-    body: JSON.stringify({ device: "pompa1", status: "ON", timestamp: Date.now() })
-});
-
-setInterval(() => {
-    fetch('http://IP_TAILSCALE_DEL_NAS/sync/update.php')
-        .then(res => res.json())
-        .then(data => {
-            console.log("Stato ricevuto dal NAS:", data);
-            // Qui aggiungi il codice per cambiare i colori/testi nella tua pagina
-        });
-}, 3000); // Controlla ogni 3 secondi
+        
 
         <body>
             <div class="card">
