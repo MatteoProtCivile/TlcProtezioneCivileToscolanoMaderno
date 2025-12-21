@@ -102,11 +102,69 @@
         </div>
     </div>
 
-    <div class="grid-container" id="devicesGrid"></div>
+    <div class="grid-container" id="devicesGrid">
+        <script>
+            const devices = [
+                { ip: '10', nome: 'RUT_955B (.10)' }, { ip: '12', nome: 'RUT_955B (.12)' },
+                { ip: '13', nome: 'PONTE RADIO (.13)' }, { ip: '14', nome: 'RUT_956A' },
+                { ip: '15', nome: 'RUT_955B (.15)' },
+                { ip: null, nome: 'SLOT DISPONIBILE' }, { ip: null, nome: 'SLOT DISPONIBILE' }, { ip: null, nome: 'SLOT DISPONIBILE' }
+            ];
+            const grid = document.getElementById('devicesGrid');
+            devices.forEach(dev => {
+                if (dev.ip) {
+                    grid.innerHTML += `
+                    <div class="device-card">
+                        <button onclick="apriIndirizzo('${dev.ip}')">🌐 ACCESSO REMOTO .${dev.ip}</button>
+                        <div id="ping-indicator-${dev.ip}" class="device-status-indicator">VERIFICA...</div>
+                        <button onclick="checkIOStatusGrafico('${dev.ip}')">📊 STATO INGRESSI</button>
+                        <input type="text" class="device-name-input" value="${dev.nome}">
+                        <img src="telt.jpg" style="max-width:140px; margin:auto;">
+                        <button onclick="toggleTeltonikaIO('on', '${dev.ip}', this)">| ATTIVA RELÈ_1</button>
+                        <button onclick="toggleTeltonikaIO('off', '${dev.ip}', this)">⭘ DISATTIVA RELÈ_1</button>
+                        <div id="indicator-${dev.ip}" class="device-status-indicator">STATO RELÈ_1</div>
+                        <button onclick="toggleTeltonikaOC('on', '${dev.ip}', this)">| ATTIVA RELÈ_2</button>
+                        <button onclick="toggleTeltonikaOC('off', '${dev.ip}', this)">⭘ DISATTIVA RELÈ_2</button>
+                        <div id="indicator-oc-${dev.ip}" class="device-status-indicator">STATO RELÈ_2</div>
+                    </div>`;
+                } else {
+                    grid.innerHTML += `<div class="device-card" style="border:2px dashed #cbd5e0; opacity:0.6; background:#f8fafc; justify-content:center;"><div style="font-size:3em; color:#cbd5e0;">➕</div><div style="font-weight:bold; color:#94a3b8;">${dev.nome}</div></div>`;
+                }
+            });
+        </script>
 
     <div class="section-card" style="background:#fff; padding:25px; border-radius:20px; margin-top:30px;">
         <h4>📡 Monitoraggio Infrastruttura Ethernet</h4>
         <div class="led-grid" id="infraGrid"></div>
+    </div>
+<div class="section-card">
+        <h4>⌨ Inoltro Porte e Accesso Manuale</h4>
+        <div style="display:flex; justify-content:center; margin-bottom:25px;">
+            <input type="text" id="ipManualeLibero" class="device-name-input" placeholder="IP Destinazione (es. 192.168.1.XX)" style="max-width:450px; border:2px solid var(--pc-orange);">
+        </div>
+        <div class="port-grid">
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="TENDA TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8082')">PORTA 8082</button>
+                    <button onclick="apriPortaManuale('8083')">PORTA 8083</button>
+                </div>
+            </div>
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="MICROTIK TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8085')">PORTA 8085</button>
+                    <button onclick="apriPortaManuale('8086')">PORTA 8086</button>
+                </div>
+            </div>
+            <div class="port-card">
+                <input type="text" class="port-label-input" value="MICROLINK TRASMITTER/RECEIVER">
+                <div class="port-btn-group">
+                    <button onclick="apriPortaManuale('8088')">PORTA 8088</button>
+                    <button onclick="apriPortaManuale('8089')">PORTA 8089</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
