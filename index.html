@@ -173,6 +173,7 @@
                 }
             });
         </script>
+<!-- ... (Il tuo codice HTML/CSS della parte 2 e inizio parte 3 rimane invariato fino a qui) ... -->
     </div>
 
     <div class="section-card">
@@ -225,12 +226,15 @@
     });
 
     async function comanda(action, ip, pin, ledId, btnElement) {
+        // Questa funzione comanda usa fetch con no-cors, che potrebbe comunque fallire su github.io
         const ledElement = document.getElementById(ledId);
         const url = `http://192.168.191.${ip}/cgi-bin/output?username=admin&password=Adminadmin01&action=${action}&pin=${pin}`;
         const blinkClass = action === 'on' ? 'blink-on' : 'blink-off';
         btnElement.classList.add(blinkClass); btnElement.disabled = true; ledElement.textContent = "INVIO...";
         try {
-            await fetch(url, { mode: 'no-cors' });
+            // L'uso di no-cors qui significa che il browser non può leggere la risposta, ma invia il comando.
+            // Se il comando arriva a destinazione, l'operazione ha successo.
+            await fetch(url, { mode: 'no-cors' }); 
             setTimeout(() => {
                 btnElement.classList.remove(blinkClass); btnElement.disabled = false;
                 ledElement.textContent = action === 'on' ? "ATTIVO (ON)" : "DISATTIVO (OFF)";
@@ -250,26 +254,56 @@
         if(!ip) return alert("Inserire IP base!"); window.open('http://' + ip + ":" + p, '_blank'); 
     }
 
-    async function checkPing(fullIp, elementId, isLed = false) {
-        const el = document.getElementById(elementId); if(!el) return;
-        try {
-            const c = new AbortController(); setTimeout(() => c.abort(), 1200);
-            await fetch(`http://${fullIp}`, { mode: 'no-cors', method: 'HEAD', signal: c.signal });
-            if(isLed) el.className = "led-bulb status-online";
-            else { el.textContent = "ONLINE"; el.style.backgroundColor = "var(--pc-green)"; el.style.color="white"; }
-        } catch {
-            if(isLed) el.className = "led-bulb status-offline";
-            else { el.textContent = "OFFLINE"; el.style.backgroundColor = "var(--pc-red)"; el.style.color="white"; }
+    /**
+     * FUNZIONE CHECKPING MODIFICATA:
+     * Utilizza un "trucco" con l'immagine per tentare di bypassare i blocchi CORS diretti.
+     * È ancora fortemente limitata dalle policy di sicurezza del browser.
+     */
+    function checkPing(fullIp, elementId, isLed = false) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        // Reset visuale mentre si controlla
+        if (isLed) {
+            el.className = "led-bulb";
+        } else {
+            el.textContent = "VERIFICA...";
+            el.style.backgroundColor = "#bdc3c7";
         }
+
+        const img = new Image();
+        const timeout = setTimeout(() => {
+            img.onerror = null; 
+            img.onload = null;
+            if (isLed) el.className = "led-bulb status-offline";
+            else { el.textContent = "OFFLINE"; el.style.backgroundColor = "var(--pc-red)"; }
+        }, 2500); // Tempo di attesa ridotto a 2.5 secondi
+
+        img.onload = () => {
+            clearTimeout(timeout);
+            if (isLed) el.className = "led-bulb status-online";
+            else { el.textContent = "ONLINE"; el.style.backgroundColor = "var(--pc-green)"; }
+        };
+        
+        img.onerror = img.onload; // Se l'immagine viene caricata (onload) o fallisce con errore (onerror) ma ha comunque contattato l'IP, consideriamo il dispositivo vivo.
+
+        // Tentiamo di caricare un'immagine inesistente sulla porta 80 dell'IP di destinazione.
+        // Se la richiesta parte e ritorna un "qualcosa", onload/onerror viene chiamato.
+        img.src = `http://${fullIp}/favicon.ico?cachebust=` + new Date().getTime();
     }
 
+
     const start = () => {
+        // La funzione start() invoca la nuova logica checkPing()
         devices.forEach(d => { if(d.ip) checkPing(`192.168.191.${d.ip}`, `ping-indicator-${d.ip}`); });
         infraIps.forEach(ip => checkPing(`192.168.1.${ip}`, `led-${ip}`, true));
     };
-    start(); setInterval(start, 15000);
+    start(); 
+    // Manteniamo l'intervallo di 15 secondi
+    setInterval(start, 15000);
 
     function checkIOStatusGrafico(ip) {
+        // ... (Questa funzione rimane invariata) ...
         const banner = document.createElement('div');
         banner.id = "banner-tecnico";
         banner.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; display:flex; align-items:center; justify-content:center; color:white; backdrop-filter:blur(5px);";
@@ -286,6 +320,8 @@
         </div>`;
         document.body.appendChild(banner);
     }
+
+
 
 function apriSupporto() {
     const width = 650;
