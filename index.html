@@ -119,10 +119,10 @@
             <button onclick="apriSupporto()" style="background:var(--pc-orange); color:var(--pc-blue); border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">🛠️ RICHIEDI SUPPORTO IT</button>
         </div>
         <div class="instructions-grid">
-            <div class="instruction-item"><span class="inst-icon">🖥️</span><div><strong>SERVER SYNC</strong><span>Monitoraggio periferiche aggiornato mediante Server.</span></div></div>
-            <div class="instruction-item"><span class="inst-icon">🔘</span><div><strong>FEEDBACK RELÈ</strong><span>Esito comando visibile tramite pulsanti premuti.</span></div></div>
-            <div class="instruction-item"><span class="inst-icon">🔐</span><div><strong>RETE VPN</strong><span>ZeroTier e Tailscale devono essere attivi sul PC.</span></div></div>
-            <div class="instruction-item"><span class="inst-icon">📩</span><div><strong>SUPPORTO IT</strong><span>Form dedicato per richieste alla struttura IT.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon">🖥️</span><div><strong>SERVER SYNC</strong>&nbsp;&nbsp;<span>Monitoraggio periferiche aggiornato mediante Server.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon">🔘</span><div><strong>FEEDBACK RELÈ</strong>&nbsp;&nbsp;<span>Esito comando visibile tramite pulsanti premuti.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon">🔐</span><div><strong>RETE VPN</strong>&nbsp;&nbsp;<span>ZeroTier e Tailscale devono essere attivi sul PC.</span></div></div>
+            <div class="instruction-item"><span class="inst-icon">📩</span><div><strong>SUPPORTO IT</strong>&nbsp;&nbsp;<span>Form dedicato per richieste alla struttura IT.</span></div></div>
         </div>
     </div>
 
@@ -357,12 +357,28 @@
         `);
     }
 
-
+    // BANNER DIAGNOSTICA AGGIORNATO
     function checkIOStatusGrafico(ip) {
         const banner = document.createElement('div');
         banner.id = "banner-tecnico";
-        banner.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; display:flex; align-items:center; justify-content:center; color:white; backdrop-filter:blur(5px);";
-        banner.innerHTML = `<div style="background:white; color:#333; padding:30px; border-radius:25px; max-width:480px; text-align:center;"><h2 style="color:var(--pc-red);">⚠️ ACCESSO PROTETTO</h2><p>Diagnostica I/O di: <b>192.168.191.${ip}</b></p><div style="display:flex; gap:15px;"><button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" style="background:#28a745; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; flex:1;">PROCEDI</button><button onclick="document.getElementById('banner-tecnico').remove();" style="background:#6c757d; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; flex:1;">ANNULLA</button></div></div>`;
+        banner.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; display:flex; align-items:center; justify-content:center; color:white; backdrop-filter:blur(8px);";
+        banner.innerHTML = `
+            <div style="background:white; color:#333; padding:35px; border-radius:20px; max-width:550px; text-align:center; border-top: 8px solid #d32f2f; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+                <h2 style="color:#d32f2f; margin-top:0;">⚠️ ACCESSO PROTETTO</h2>
+                <p style="font-weight:bold; font-size:1.1em;">Diagnostica Avanzata I/O: <span style="color:#002d5a;">192.168.191.${ip}</span></p>
+                <div style="background:#fff3f3; border:1px solid #f8d7da; padding:15px; border-radius:10px; margin:20px 0; text-align:left; font-size:0.95em; line-height:1.5;">
+                    <p style="margin:0; color:#721c24;">
+                        <strong>ATTENZIONE:</strong> Saranno richieste le credenziali amministrative. 
+                        L'accesso da parte di <strong>personale non esperto</strong> potrebbe compromettere il funzionamento e la <strong>connettività di rete</strong> del sistema.
+                    </p>
+                </div>
+                <div style="display:flex; gap:15px;">
+                    <button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" 
+                            style="background:#28a745; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; flex:1; font-weight:bold;">AUTORIZZO E PROCEDO</button>
+                    <button onclick="document.getElementById('banner-tecnico').remove();" 
+                            style="background:#6c757d; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; flex:1; font-weight:bold;">ANNULLA</button>
+                </div>
+            </div>`;
         document.body.appendChild(banner);
     }
 </script>
