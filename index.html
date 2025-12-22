@@ -269,7 +269,7 @@
     const timeoutId = setTimeout(() => {
         controller.abort();
         setOffline(el, isLed);
-    }, 4000); // Timeout di 4 secondi
+    }, 1500); // Timeout di 1,5 secondi
 
     // Usiamo fetch con mode 'no-cors' per testare se il web server risponde
     fetch(`http://${fullIp}`, { 
@@ -308,7 +308,7 @@
         devices.forEach(d => { if(d.ip) checkPing(`192.168.191.${d.ip}`, `ping-indicator-${d.ip}`); });
         infraIps.forEach(ip => checkPing(`192.168.1.${ip}`, `led-${ip}`, true));
     };
-    startPing(); setInterval(startPing, 15000);
+    startPing(); setInterval(startPing, 5000);
 
        function apriSupporto() {
         const win = window.open("", "_blank", "width=500,height=650");
