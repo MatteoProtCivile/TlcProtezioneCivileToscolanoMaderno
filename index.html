@@ -262,13 +262,37 @@
     }
 
     function checkPing(fullIp, elementId, isLed = false) {
-        const el = document.getElementById(elementId);
-        const img = new Image();
-        const timeout = setTimeout(() => { setOffline(el, isLed); img.src = ""; }, 3500);
-        img.onload = () => { clearTimeout(timeout); setOnline(el, isLed); };
-        img.onerror = () => { clearTimeout(timeout); setOffline(el, isLed); };
-        img.src = `http://${fullIp}/favicon.ico?cb=${Date.now()}`;
-    }
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+        setOffline(el, isLed);
+    }, 4000); // Timeout di 4 secondi
+
+    // Usiamo fetch con mode 'no-cors' per testare se il web server risponde
+    fetch(`http://${fullIp}`, { 
+        mode: 'no-cors', 
+        signal: controller.signal,
+        cache: 'no-store' 
+    })
+    .then(() => {
+        clearTimeout(timeoutId);
+        setOnline(el, isLed);
+    })
+    .catch((err) => {
+        clearTimeout(timeoutId);
+        // Se l'errore è dovuto a CORS o sicurezza, ma non a un timeout/connessione fallita,
+        // spesso significa che il server ha risposto (quindi è ONLINE)
+        if (err.name !== 'AbortError') {
+            setOnline(el, isLed);
+        } else {
+            setOffline(el, isLed);
+        }
+    });
+}
+
 
     function setOnline(el, isLed) {
         if (isLed) el.className = "led-bulb status-online";
@@ -312,12 +336,12 @@
                     <div class="info-box"><strong>NOTA:</strong> Segnala qui guasti hardware o bug della dashboard.</div>
                     <!-- LINK FORM SPREE AGGIORNATO CON TUO ID -->
                     <form
-  action="https://formspree.io/f/mwveqjrn"
+  action="https://formspree.io/f/mjknnney"
   method="POST"
 >
   <label>
     Nome e Cognome:
-    <input type="name" name="">
+    <input type="name" name="operatore">
   </label>
   <label>
     Scrivi la tua segnalazione:
@@ -327,27 +351,18 @@
   <button type="submit">Send</button>
 </form>
                 </div>
-                <div class="footer">Sistema Monitoraggio v20.3.25 | 2025</div>
+                <div class="footer">Sistema IT Tlc Protezione Civile TM | 2025</div>
             </body>
             </html>
         `);
     }
 
 
-       function checkIOStatusGrafico(ip) {
+    function checkIOStatusGrafico(ip) {
         const banner = document.createElement('div');
         banner.id = "banner-tecnico";
         banner.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; display:flex; align-items:center; justify-content:center; color:white; backdrop-filter:blur(5px);";
-        banner.innerHTML = `
-        <div style="background:white; color:#333; padding:30px; border-radius:25px; max-width:480px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
-            <h2 style="color:var(--pc-red);">⚠️ ACCESSO PROTETTO</h2>
-            <p>Diagnostica I/O di:<br><b>192.168.191.${ip}</b></p>
-            <div style="background:#fff3cd; padding:15px; border-radius:12px; margin:20px 0; font-size:0.85em; text-align:left; border-left:5px solid #ff9900; color:#856404;"><b>NOTA TECNICA:</b> Verranno richieste credenziali Admin. L'uso improprio può compromettere la rete.</div>
-            <div style="display:flex; gap:15px; justify-content:center;">
-                <button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" style="background:#28a745; color:white; border:none; padding:12px 25px; border-radius:10px; cursor:pointer; font-weight:bold; flex:1;">PROCEDI</button>
-                <button onclick="document.getElementById('banner-tecnico').remove();" style="background:#6c757d; color:white; border:none; padding:12px 25px; border-radius:10px; cursor:pointer; font-weight:bold; flex:1;">ANNULLA</button>
-            </div>
-        </div>`;
+        banner.innerHTML = `<div style="background:white; color:#333; padding:30px; border-radius:25px; max-width:480px; text-align:center;"><h2 style="color:var(--pc-red);">⚠️ ACCESSO PROTETTO</h2><p>Diagnostica I/O di: <b>192.168.191.${ip}</b></p><div style="display:flex; gap:15px;"><button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" style="background:#28a745; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; flex:1;">PROCEDI</button><button onclick="document.getElementById('banner-tecnico').remove();" style="background:#6c757d; color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; flex:1;">ANNULLA</button></div></div>`;
         document.body.appendChild(banner);
     }
 </script>
