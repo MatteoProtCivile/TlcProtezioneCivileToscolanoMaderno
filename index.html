@@ -7,7 +7,7 @@
        ========================================== */
     const usaPassword = false;          
     const passwordSegreta = "PC2025TM"; 
-    const sitoInManutenzione = false; // Imposta su true per testare la nuova grafica
+    const sitoInManutenzione = false; 
 
     if (sitoInManutenzione) {
         window.stop();
@@ -261,56 +261,52 @@
         if(!ip) return alert("Inserire IP base!"); window.open('http://' + ip + ":" + p, '_blank'); 
     }
 
+    /* LOGICA PING CORRETTA PER PROTEZIONE CIVILE 2025 */
     function checkPing(fullIp, elementId, isLed = false) {
-    const el = document.getElementById(elementId);
-    if (!el) return;
+        const el = document.getElementById(elementId);
+        if (!el) return;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-        controller.abort();
-        setOffline(el, isLed);
-    }, 1500); // Timeout di 1,5 secondi
+        // Reset visivo immediato per evitare confusione
+        if (isLed) { el.className = "led-bulb"; } 
+        else { el.textContent = "VERIFICA..."; el.style.background = "#bdc3c7"; el.style.color = "#333"; }
 
-    // Usiamo fetch con mode 'no-cors' per testare se il web server risponde
-    fetch(`http://${fullIp}`, { 
-        mode: 'no-cors', 
-        signal: controller.signal,
-        cache: 'no-store' 
-    })
-    .then(() => {
-        clearTimeout(timeoutId);
-        setOnline(el, isLed);
-    })
-    .catch((err) => {
-        clearTimeout(timeoutId);
-        // Se l'errore è dovuto a CORS o sicurezza, ma non a un timeout/connessione fallita,
-        // spesso significa che il server ha risposto (quindi è ONLINE)
-        if (err.name !== 'AbortError') {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500); 
+
+        fetch(`http://${fullIp}`, { 
+            mode: 'no-cors', 
+            signal: controller.signal,
+            cache: 'no-store' 
+        })
+        .then(() => {
+            clearTimeout(timeoutId);
             setOnline(el, isLed);
-        } else {
+        })
+        .catch(() => {
+            clearTimeout(timeoutId);
             setOffline(el, isLed);
-        }
-    });
-}
-
+        });
+    }
 
     function setOnline(el, isLed) {
         if (isLed) el.className = "led-bulb status-online";
-        else { el.textContent = "ONLINE"; el.style.background = "var(--pc-green)"; el.style.color = "white"; }
+        else { el.textContent = "ONLINE"; el.style.background = "var(--pc-green)"; el.style.color = "white"; el.className = "device-status-indicator status-on-active"; }
     }
 
     function setOffline(el, isLed) {
         if (isLed) el.className = "led-bulb status-offline";
-        else { el.textContent = "OFFLINE"; el.style.background = "var(--pc-red)"; el.style.color = "white"; }
+        else { el.textContent = "OFFLINE"; el.style.background = "var(--pc-red)"; el.style.color = "white"; el.className = "device-status-indicator status-off-active"; }
     }
 
     const startPing = () => {
         devices.forEach(d => { if(d.ip) checkPing(`192.168.191.${d.ip}`, `ping-indicator-${d.ip}`); });
         infraIps.forEach(ip => checkPing(`192.168.1.${ip}`, `led-${ip}`, true));
     };
-    startPing(); setInterval(startPing, 5000);
 
-       function apriSupporto() {
+    startPing(); 
+    setInterval(startPing, 15000); // Aggiornamento ogni 15 secondi
+
+    function apriSupporto() {
         const win = window.open("", "_blank", "width=500,height=650");
         win.document.write(`
             <html>
@@ -320,63 +316,36 @@
                     body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #eef2f5; display: flex; flex-direction: column; height: 100vh; }
                     .header { background: #002d5a; color: white; padding: 20px; text-align: center; border-bottom: 5px solid #ff9900; }
                     .content { padding: 30px; flex-grow: 1; }
-                    .form-group { margin-bottom: 20px; text-align: left; }
                     label { display: block; font-weight: bold; margin-bottom: 5px; color: #002d5a; font-size: 0.9em; }
-                    input, textarea { width: 100%; padding: 12px; border: 2px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
-                    .info-box { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; font-size: 0.8em; margin-bottom: 20px; border-left: 4px solid #ff9900; }
-                    button { width: 100%; background: #002d5a; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1em; }
-                    .footer { font-size: 0.7em; color: #718096; padding: 20px; text-align: center; }
+                    input, textarea { width: 100%; padding: 12px; border: 2px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; }
+                    button { width: 100%; background: #002d5a; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
                 </style>
             </head>
             <body>
-                <div class="header">
-                    <h2 style="margin:0; font-size:1.4em;">🛠️ Supporto Tecnico IT</h2>
-                </div>
+                <div class="header"><h2>🛠️ Supporto Tecnico IT</h2></div>
                 <div class="content">
-                    <div class="info-box"><strong>NOTA:</strong> Segnala qui guasti hardware o bug della dashboard.</div>
-                    <!-- LINK FORM SPREE AGGIORNATO CON TUO ID -->
-                    <form
-  action="https://formspree.io/f/mjknnney"
-  method="POST"
->
-  <label>
-    Nome e Cognome:
-    <input type="name" name="operatore">
-  </label>
-  <label>
-    Scrivi la tua segnalazione:
-    <textarea name="message"></textarea>
-  </label>
-  <!-- your other form fields go here -->
-  <button type="submit">Send</button>
-</form>
+                    <form action="formspree.io" method="POST">
+                        <label>Nome Operatore:<input type="text" name="operatore" required></label>
+                        <label>Messaggio:<textarea name="message" required></textarea></label>
+                        <button type="submit">INVIA</button>
+                    </form>
                 </div>
-                <div class="footer">Sistema IT Tlc Protezione Civile TM | 2025</div>
             </body>
             </html>
         `);
     }
 
-    // BANNER DIAGNOSTICA AGGIORNATO
     function checkIOStatusGrafico(ip) {
         const banner = document.createElement('div');
         banner.id = "banner-tecnico";
         banner.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; display:flex; align-items:center; justify-content:center; color:white; backdrop-filter:blur(8px);";
         banner.innerHTML = `
-            <div style="background:white; color:#333; padding:35px; border-radius:20px; max-width:550px; text-align:center; border-top: 8px solid #d32f2f; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
-                <h2 style="color:#d32f2f; margin-top:0;">⚠️ ACCESSO PROTETTO</h2>
-                <p style="font-weight:bold; font-size:1.1em;">Diagnostica Avanzata I/O: <span style="color:#002d5a;">192.168.191.${ip}</span></p>
-                <div style="background:#fff3f3; border:1px solid #f8d7da; padding:15px; border-radius:10px; margin:20px 0; text-align:left; font-size:0.95em; line-height:1.5;">
-                    <p style="margin:0; color:#721c24;">
-                        <strong>ATTENZIONE:</strong> Saranno richieste le credenziali amministrative. 
-                        L'accesso da parte di <strong>personale non esperto</strong> potrebbe compromettere il funzionamento e la <strong>connettività di rete</strong> del sistema.
-                    </p>
-                </div>
+            <div style="background:white; color:#333; padding:35px; border-radius:20px; max-width:550px; text-align:center; border-top: 8px solid #d32f2f;">
+                <h2 style="color:#d32f2f;">⚠️ ACCESSO PROTETTO</h2>
+                <p>Diagnostica Avanzata: 192.168.191.${ip}</p>
                 <div style="display:flex; gap:15px;">
-                    <button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" 
-                            style="background:#28a745; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; flex:1; font-weight:bold;">AUTORIZZO E PROCEDO</button>
-                    <button onclick="document.getElementById('banner-tecnico').remove();" 
-                            style="background:#6c757d; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; flex:1; font-weight:bold;">ANNULLA</button>
+                    <button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" style="background:#28a745; color:white; padding:15px; border-radius:10px; flex:1;">PROCEDI</button>
+                    <button onclick="document.getElementById('banner-tecnico').remove();" style="background:#6c757d; color:white; padding:15px; border-radius:10px; flex:1;">ANNULLA</button>
                 </div>
             </div>`;
         document.body.appendChild(banner);
