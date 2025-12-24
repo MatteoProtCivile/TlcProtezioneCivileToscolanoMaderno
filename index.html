@@ -89,7 +89,6 @@
         .device-name-input { width: 100%; height: 42px; border: 2px solid #edf2f7; border-radius: 8px; text-align: center; font-weight: 800; color: var(--pc-blue); background: #f8fafc; }
         .device-card button, .section-card button { padding: 10px; font-size: 0.85em; border-radius: 6px; border: 1px solid #d1d9e6; background-color: #f8fafc; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .section-divider { display: flex; align-items: center; justify-content: center; margin: 40px auto; max-width: 1600px; }
-        .divider-line { flex-grow: 1; height: 3px; background: #cbd5e0; }
         .divider-text { background: var(--pc-blue); color: white; padding: 8px 20px; border-radius: 50px; font-weight: bold; font-size: 0.85em; margin: 0 15px; border: 2px solid var(--pc-orange); }
         .device-status-indicator { padding: 8px; font-size: 0.85em; font-weight: bold; border-radius: 6px; text-align: center; background-color: #bdc3c7; color: #333; transition: 0.3s; }
         .status-on-active { background-color: var(--status-on) !important; color: white !important; }
@@ -133,7 +132,6 @@
         <div class="divider-text">📡 INFRASTRUTTURA: Visualizzazione stato locale e accesso antenne P2P da remoto</div>
         <div class="divider-line"></div>
     </div>
-
     <div class="section-card">
         <h4>🖥️ Monitoraggio Infrastruttura Ethernet Locale</h4>
         <div class="led-grid" id="infraGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px;"></div>
@@ -169,12 +167,18 @@
 <script>
     const NAS_URL = 'http://100.111.26.63:81'; 
 
+    /* CONFIGURAZIONE DISPOSITIVI CON 5 FOTO DIFFERENTI */
     const devices = [
-        { ip: '10', nome: 'RUT_955B (.10)' }, { ip: '12', nome: 'RUT_955B (.12)' },
-        { ip: '13', nome: 'PONTE RADIO (.13)' }, { ip: '14', nome: 'RUT_956A' },
-        { ip: '15', nome: 'RUT_955B (.15)' },
-        { ip: null, nome: 'SLOT DISPONIBILE' }, { ip: null, nome: 'SLOT DISPONIBILE' }, { ip: null, nome: 'SLOT DISPONIBILE' }
+        { ip: '10', nome: 'RUT_955B (.10)', foto: 'foto1.jpg' }, 
+        { ip: '12', nome: 'RUT_955B (.12)', foto: 'foto2.jpg' },
+        { ip: '13', nome: 'PONTE RADIO (.13)', foto: 'foto3.jpg' }, 
+        { ip: '14', nome: 'RUT_956A', foto: 'foto4.jpg' },
+        { ip: '15', nome: 'RUT_955B (.15)', foto: 'foto5.jpg' },
+        { ip: null, nome: 'SLOT DISPONIBILE', foto: null }, 
+        { ip: null, nome: 'SLOT DISPONIBILE', foto: null }, 
+        { ip: null, nome: 'SLOT DISPONIBILE', foto: null }
     ];
+
     const infraIps = ['2', '3', '200', '201', '230', '231'];
     const defaultNames = { '2': 'Microtik TX', '3': 'Microtik RX', '200': 'Tenda TX', '201': 'Tenda RX', '230': 'Ponte TX', '231': 'Ponte RX' };
 
@@ -187,7 +191,7 @@
                 <div id="ping-indicator-${dev.ip}" class="device-status-indicator">VERIFICA...</div>
                 <button onclick="checkIOStatusGrafico('${dev.ip}')">📊 STATO INGRESSI</button>
                 <input type="text" class="device-name-input" value="${dev.nome}">
-                <img src="telt.jpg" style="max-width:140px; margin:auto;">
+                <img src="${dev.foto}" style="max-width:140px; height:100px; object-fit:contain; margin:auto; display:block;">
                 <div style="display:grid; gap:5px;">
                     <button onclick="toggleTeltonikaIO('on', '${dev.ip}', this)">| ATTIVA RELÈ_1</button>
                     <button onclick="toggleTeltonikaIO('off', '${dev.ip}', this)">⭘ DISATTIVA RELÈ_1</button>
@@ -261,30 +265,34 @@
         if(!ip) return alert("Inserire IP base!"); window.open('http://' + ip + ":" + p, '_blank'); 
     }
 
-    /* LOGICA PING CORRETTA PER PROTEZIONE CIVILE 2025 */
     function checkPing(fullIp, elementId, isLed = false) {
         const el = document.getElementById(elementId);
         if (!el) return;
-
-        // Reset visivo immediato per evitare confusione
+        let cardButtons = [];
+        if (!isLed) {
+            const card = el.closest('.device-card');
+            if (card) cardButtons = card.querySelectorAll('button');
+        }
         if (isLed) { el.className = "led-bulb"; } 
         else { el.textContent = "VERIFICA..."; el.style.background = "#bdc3c7"; el.style.color = "#333"; }
-
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2500); 
-
-        fetch(`http://${fullIp}`, { 
-            mode: 'no-cors', 
-            signal: controller.signal,
-            cache: 'no-store' 
-        })
+        fetch(`http://${fullIp}`, { mode: 'no-cors', signal: controller.signal, cache: 'no-store' })
         .then(() => {
             clearTimeout(timeoutId);
             setOnline(el, isLed);
+            if (!isLed) { cardButtons.forEach(btn => { btn.disabled = false; btn.style.opacity = "1"; btn.style.cursor = "pointer"; }); }
         })
         .catch(() => {
             clearTimeout(timeoutId);
             setOffline(el, isLed);
+            if (!isLed) {
+                cardButtons.forEach(btn => {
+                    if (!btn.classList.contains('blink-on') && !btn.classList.contains('blink-off')) {
+                        btn.disabled = true; btn.style.opacity = "0.4"; btn.style.cursor = "not-allowed";
+                    }
+                });
+            }
         });
     }
 
@@ -304,38 +312,17 @@
     };
 
     startPing(); 
-    setInterval(startPing, 15000); // Aggiornamento ogni 15 secondi
+    setInterval(startPing, 15000);
 
+    /* FORM SUPPORTO CORRETTO CON INVIO DATI */
     function apriSupporto() {
         const win = window.open("", "_blank", "width=500,height=650");
         win.document.write(`
             <html>
-            <head>
-                <title>Supporto IT - PC 2025</title>
-                <style>
-                    body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #eef2f5; display: flex; flex-direction: column; height: 100vh; }
-                    .header { background: #002d5a; color: white; padding: 20px; text-align: center; border-bottom: 5px solid #ff9900; }
-                    .content { padding: 30px; flex-grow: 1; }
-                    label { display: block; font-weight: bold; margin-bottom: 5px; color: #002d5a; font-size: 0.9em; }
-                    input, textarea { width: 100%; padding: 12px; border: 2px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; }
-                    button { width: 100%; background: #002d5a; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-                </style>
-            </head>
-            <body>
-                <div class="header"><h2>🛠️ Supporto Tecnico IT</h2></div>
-                <div class="content">
-                    <form action="formspree.io" method="POST">
-                        <label>Nome Operatore:<input type="text" name="operatore" required></label>
-                        <label>Messaggio:<textarea name="message" required></textarea></label>
-                        <button type="submit">INVIA</button>
-                    </form>
-                </div>
-            </body>
-            </html>
-        `);
+            <head><title>Supporto IT</title><style>body{margin:0;padding:0;font-family:sans-serif;background:#eef2f5}.header{background:#002d5a;color:white;padding:20px;text-align:center;border-bottom:5px solid #ff9900}.content{padding:30px}label{display:block;font-weight:bold;margin-bottom:5px;color:#002d5a}input,textarea{width:100%;padding:12px;border:2px solid #cbd5e0;border-radius:8px;box-sizing:border-box;margin-bottom:20px}button{width:100%;background:#002d5a;color:white;border:none;padding:15px;border-radius:8px;font-weight:bold;cursor:pointer}</style></head>
+            <body><div class="header"><h2>🛠️ Supporto Tecnico</h2></div><div class="content"><form action="formspree.io" method="POST"><label>Operatore:</label><input type="text" name="operatore" required><label>Messaggio:</label><textarea name="messaggio" rows="5" required></textarea><button type="submit">INVIA SEGNALAZIONE</button></form></div></body></html>`);
     }
 
-   // BANNER DIAGNOSTICA AGGIORNATO
     function checkIOStatusGrafico(ip) {
         const banner = document.createElement('div');
         banner.id = "banner-tecnico";
@@ -345,17 +332,9 @@
                 <h2 style="color:#d32f2f; margin-top:0;">⚠️ ACCESSO PROTETTO</h2>
                 <p style="font-weight:bold; font-size:1.1em;">Diagnostica Avanzata I/O: <span style="color:#002d5a;">192.168.191.${ip}</span></p>
                 <div style="background:#fff3f3; border:1px solid #f8d7da; padding:15px; border-radius:10px; margin:20px 0; text-align:left; font-size:0.95em; line-height:1.5;">
-                    <p style="margin:0; color:#721c24;">
-                        <strong>ATTENZIONE:</strong> Saranno richieste le credenziali amministrative. 
-                        L'accesso da parte di <strong>personale non esperto</strong> potrebbe compromettere il funzionamento e la <strong>connettività di rete</strong> del sistema.
-                    </p>
+                    <p style="margin:0; color:#721c24;"><strong>ATTENZIONE:</strong> Saranno richieste credenziali amministrative. L'accesso da personale non esperto potrebbe compromettere la connettività di rete.</p>
                 </div>
-                <div style="display:flex; gap:15px;">
-                    <button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" 
-                            style="background:#28a745; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; flex:1; font-weight:bold;">AUTORIZZO E PROCEDO</button>
-                    <button onclick="document.getElementById('banner-tecnico').remove();" 
-                            style="background:#6c757d; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; flex:1; font-weight:bold;">ANNULLA</button>
-                </div>
+                <div style="display:flex; gap:15px;"><button onclick="window.open('http://192.168.191.${ip}/cgi-bin/luci/admin/services/input-output/status/?status=1', '_blank'); document.getElementById('banner-tecnico').remove();" style="background:#28a745; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; flex:1; font-weight:bold;">PROCEDO</button><button onclick="document.getElementById('banner-tecnico').remove();" style="background:#6c757d; color:white; border:none; padding:15px; border-radius:10px; cursor:pointer; flex:1; font-weight:bold;">ANNULLA</button></div>
             </div>`;
         document.body.appendChild(banner);
     }
