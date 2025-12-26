@@ -155,7 +155,7 @@
         <div style="padding: 10px 0; font-weight: bold;">&copy; 2025 Protezione Civile Toscolano Maderno | IT: Matteo Podavini</div>
     </footer>
 <script>
-    const NAS_URL = 'http://100.111.26.63:85/update.php'; 
+    const NAS_URL = '100.111.26.63'; 
 
     const devices = [
         { ip: '10', nome: 'Quadro Mobile TLC', foto: 'Senza titolo.png' }, 
@@ -292,7 +292,7 @@
     };
     setInterval(startPing, 15000); startPing();
 
-    // BANNER E ACCESSI
+    // BANNER E ACCESSI (LOGICA MODIFICATA PER SEMAFORO.HTML)
     function accessoProtettoSemaforo() {
         const banner = document.createElement('div');
         banner.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:20000;display:flex;align-items:center;justify-content:center;color:white;backdrop-filter:blur(8px);";
@@ -301,7 +301,10 @@
                 <h2 style="color:var(--pc-blue);">🚦 ACCESSO SEMAFORO</h2>
                 <input type="text" id="uS" placeholder="Username" style="width:100%;padding:12px;margin:10px 0;border:2px solid #ddd;border-radius:8px;">
                 <input type="password" id="pS" placeholder="Password" style="width:100%;padding:12px;margin:10px 0;border:2px solid #ddd;border-radius:8px;">
-                <button onclick="if(document.getElementById('uS').value=='admin'&&document.getElementById('pS').value=='pctlc2025'){window.open('about:blank','_blank');this.parentElement.parentElement.remove();}else{alert('Dati errati');}" style="width:100%;background:var(--pc-green);color:white;border:none;padding:15px;border-radius:10px;font-weight:bold;cursor:pointer;">ACCEDI</button>
+                <button onclick="if(document.getElementById('uS').value=='admin'&&document.getElementById('pS').value=='pctlc2025'){window.location.href='semaforo.html';}else{alert('Dati errati');}" 
+                        style="width:100%;background:var(--pc-green);color:white;border:none;padding:15px;border-radius:10px;font-weight:bold;cursor:pointer;">
+                    ACCEDI
+                </button>
                 <button onclick="this.parentElement.parentElement.remove();" style="width:100%;margin-top:10px;background:#6c757d;color:white;border:none;padding:15px;border-radius:10px;font-weight:bold;cursor:pointer;">ANNULLA</button>
             </div>`;
         document.body.appendChild(banner);
