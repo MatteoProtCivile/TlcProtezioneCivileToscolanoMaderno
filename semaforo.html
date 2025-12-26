@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA TLC v4.0 - Protezione Civile Toscolano Maderno</title>
+    <style>
+        :root {
+            --pc-blue: #003366;
+            --pc-yellow: #ffcc00;
+            --pc-bg: #d1d8e0;
+            --status-green: #28a745;
+            --status-orange: #ff9f1c;
+            --status-red: #dc3545;
+            --emergency-blue: #0055ff;
+        }
+
+        body {
+            background-color: var(--pc-bg);
+            color: #212529;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header-istituzionale {
+            background-color: var(--pc-blue); color: white;
+            padding: 10px 25px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 4px solid var(--pc-yellow); box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            width: 100%; box-sizing: border-box;
+        }
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .label-pc { background-color: var(--pc-yellow); color: var(--pc-blue); padding: 5px 15px; font-weight: 900; border-radius: 4px; font-size: 1.4rem; text-transform: uppercase; }
+        .titolo-comune { font-weight: 900; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        
+        .op-box { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 6px; border: 1px solid var(--pc-yellow); }
+        .op-box label { color: var(--pc-yellow); font-weight: bold; font-size: 0.75rem; text-transform: uppercase; }
+        .op-box input { background: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: 900; text-transform: uppercase; color: var(--pc-blue); width: 180px; }
+
+        .datetime-display { font-family: 'Consolas', monospace; font-weight: bold; font-size: 1.1rem; color: var(--pc-yellow); text-align: right; }
+
+        /* LAYOUT UNITÀ */
+        .main-container { display: flex; flex-direction: column; align-items: center; padding: 15px; gap: 15px; flex: 1; }
+        .row-controlli { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1850px; }
+        .control-module { background: white; border: 2px solid var(--pc-blue); border-radius: 10px; flex: 1; min-width: 600px; max-width: 850px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .status-header { padding: 12px 18px; background: #f8f9fa; border-bottom: 2px solid var(--pc-blue); color: var(--pc-blue); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+
+        .ping-box { padding: 5px 15px; border-radius: 6px; font-size: 0.9rem; font-weight: 900; text-transform: uppercase; color: white; min-width: 110px; text-align: center; }
+        .online-bg { background-color: var(--status-green); }
+        .offline-bg { background-color: var(--status-red); animation: blink-soft 2s infinite; }
+
+        .status-label { padding: 8px 18px; border-radius: 25px; font-size: 0.9rem; text-transform: uppercase; font-weight: 900; min-width: 200px; text-align: center; }
+        .status-label.chiuso { background: var(--status-red); color: white; }
+        .status-label.aperto { background: var(--status-green); color: white; }
+        .status-label.attesa { background: var(--status-orange); color: white; animation: blink-chromatic 0.6s infinite alternate; }
+        .status-label.emergenza { background: #000; color: #ff0000; animation: blink-hard 0.4s infinite; border: 2px solid #ff0000; }
+        
+        .module-content { display: flex; padding: 20px; gap: 20px; }
+        .semaforo-col { display: flex; flex-direction: column; align-items: center; gap: 15px; background: #eee; padding: 15px; border-radius: 12px; border: 1px solid #ddd; }
+        .traffic-box { display: flex; flex-direction: column; gap: 10px; background: #1a1a1a; padding: 15px; border-radius: 15px; border: 4px solid #333; }
+        .light-unit { width: 50px; height: 50px; background: #333; border-radius: 50%; border: 2px solid #000; }
+        .light-unit.red.active { background: var(--status-red); box-shadow: 0 0 20px var(--status-red); }
+        .light-unit.orange.active { background: var(--status-orange); box-shadow: 0 0 20px var(--status-orange); }
+        .light-unit.green.active { background: var(--status-green); box-shadow: 0 0 20px var(--status-green); }
+        
+        .action-btn { width: 100%; height: 60px; border: 3px solid; font-weight: 900; cursor: pointer; border-radius: 8px; font-size: 1.1rem; text-transform: uppercase; }
+        .btn-alt { background: #fff1f0; color: var(--status-red); border-color: var(--status-red); }
+        .btn-vai { background: #f6ffed; color: var(--status-green); border-color: var(--status-green); }
+
+        .cam-square { width: 100%; height: 350px; background: #000; position: relative; border-radius: 6px; overflow: hidden; border: 2px solid #333; }
+        .cam-square iframe { width: 100%; height: 100%; border: none; }
+
+        /* AREA EMERGENZA */
+        .btn-emergency { 
+            background: linear-gradient(135deg, #ff0000 0%, #990000 100%); 
+            color: white; border: 5px solid #ffffff; padding: 25px 80px; 
+            font-size: 1.6rem; font-weight: 900; cursor: pointer; border-radius: 12px; 
+            text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+            transition: all 0.4s ease-in-out;
+        }
+        .btn-emergency:not(.active) { animation: pulse-blue-soft 3s infinite ease-in-out; }
+        .btn-emergency.active { background: #ff0000; animation: emergency-glow-soft 1s infinite ease-in-out; box-shadow: 0 0 30px #ff0000; }
+
+        @keyframes pulse-blue-soft {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 85, 255, 0.3); border-color: #ffffff; }
+            50% { box-shadow: 0 0 25px var(--emergency-blue); border-color: var(--emergency-blue); }
+        }
+        @keyframes emergency-glow-soft {
+            0%, 100% { background: #ff0000; color: white; transform: scale(1); }
+            50% { background: #ffffff; color: #ff0000; transform: scale(1.02); }
+        }
+
+        /* ISTRUZIONI E LOG */
+        .istruzioni-box { width: 100%; max-width: 1820px; background: #fff; border: 2px solid var(--pc-blue); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .istruzioni-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+        .istr-item { font-size: 0.85rem; padding: 20px; border-right: 1px solid #ddd; line-height: 1.5; }
+        .istr-item:last-child { border-right: none; }
+        .istr-item strong { color: var(--pc-blue); display: block; margin-bottom: 8px; text-transform: uppercase; border-bottom: 2px solid var(--pc-yellow); }
+        
+        .log-area { background: #111; color: #00ff00; font-family: 'Consolas', monospace; padding: 12px; height: 150px; overflow-y: scroll; border: 2px solid #333; display: flex; flex-direction: column-reverse; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; }
+        @keyframes blink-chromatic { from { background: var(--status-orange); } to { background: #ffcc00; color: var(--pc-blue); } }
+        @keyframes blink-hard { 0%, 100% { background: #000; color: #fff; } 50% { background: #ff0000; color: #fff; } }
+        @keyframes blink-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    </style>
+</head>
+<body>
+
+    <!-- MODALI DI SICUREZZA -->
+    <div id="modalEmergency" class="modal-overlay">
+        <div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:500px; border: 8px solid var(--status-red);">
+            <h2 style="color: var(--status-red); font-size: 2rem;">⚠️ EMERGENZA</h2>
+            <p style="font-size: 1.2rem; margin: 20px 0;">ATTIVARE IL BLOCCO TOTALE IMMEDIATO?<br>Tutti i segnali passeranno al ROSSO fisso.</p>
+            <button class="action-btn btn-alt" style="width:200px" onclick="actionEmergency(true)">SÌ, ATTIVA</button>
+            <button class="action-btn" style="border-color:#ccc; margin-top:10px; width:200px" onclick="closeModals()">ANNULLA</button>
+        </div>
+    </div>
+
+    <div id="modalReset" class="modal-overlay">
+        <div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:500px; border: 8px solid var(--pc-blue);">
+            <h2>🔄 RIPRISTINO</h2>
+            <p style="font-size: 1.2rem; margin: 20px 0;">DISATTIVARE L'EMERGENZA E RIPRISTINARE I COMANDI?</p>
+            <button class="action-btn btn-vai" style="width:200px" onclick="actionEmergency(false)">SÌ, RIPRISTINA</button>
+            <button class="action-btn" style="border-color:#ccc; margin-top:10px; width:200px" onclick="closeModals()">ANNULLA</button>
+        </div>
+    </div>
+
+    <header class="header-istituzionale">
+        <div class="header-brand">
+            <span class="label-pc">Protezione Civile</span>
+            <h1 class="titolo-comune">TOSCOLANO MADERNO</h1>
+        </div>
+
+        <div class="op-box">
+            <label>Operatore:</label>
+            <input type="text" id="operatore-name" placeholder="NOME COGNOME" required>
+        </div>
+
+        <div class="datetime-display">
+            <div id="clock-display">--:--:--</div>
+            <span id="date-display" style="font-size:0.8rem; color:white">--/--/----</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="row-controlli">
+            <!-- UNITA 01 - NORD -->
+            <div class="control-module">
+                <div class="status-header">
+                    <div style="display:flex; align-items:center; gap:10px">
+                        <span>POSTAZIONE - 01 </span>
+                        <div id="node-sem1" class="ping-box offline-bg">OFFLINE</div>
+                    </div>
+                    <span id="label-sem1" class="status-label chiuso">● CHIUSO</span>
+                </div>
+                <div class="module-content">
+                    <div class="semaforo-col">
+                        <div class="traffic-box" id="sem1">
+                            <div class="light-unit red active"></div>
+                            <div class="light-unit orange"></div>
+                            <div class="light-unit green"></div>
+                        </div>
+                        <div class="btn-group-vertical">
+                            <button class="action-btn btn-alt" onclick="updateSem('sem1','r')">ALT</button>
+                            <button class="action-btn btn-vai" onclick="updateSem('sem1','v')">VAI</button>
+                        </div>
+                    </div>
+                    <div class="cam-wrapper" style="flex:1">
+                        <div class="cam-square" id="screen-sem1">
+                            <div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem">TLC NORD_01</div>
+                        </div>
+                        <div style="margin-top:10px; display:flex; gap:5px;">
+                            <input type="text" id="url-sem1" placeholder="IP Camera" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ccc">
+                            <button onclick="loadCam('sem1')" style="padding:0 15px; background:var(--pc-blue); color:white; border:none; border-radius:4px; cursor:pointer">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- UNITA 02 - SUD -->
+            <div class="control-module">
+                <div class="status-header">
+                    <div style="display:flex; align-items:center; gap:10px">
+                        <span>POSTAZIONE - 02</span>
+                        <div id="node-sem2" class="ping-box offline-bg">OFFLINE</div>
+                    </div>
+                    <span id="label-sem2" class="status-label chiuso">● CHIUSO</span>
+                </div>
+                <div class="module-content">
+                    <div class="semaforo-col">
+                        <div class="traffic-box" id="sem2">
+                            <div class="light-unit red active"></div>
+                            <div class="light-unit orange"></div>
+                            <div class="light-unit green"></div>
+                        </div>
+                        <div class="btn-group-vertical">
+                            <button class="action-btn btn-alt" onclick="updateSem('sem2','r')">ALT</button>
+                            <button class="action-btn btn-vai" onclick="updateSem('sem2','v')">VAI</button>
+                        </div>
+                    </div>
+                    <div class="cam-wrapper" style="flex:1">
+                        <div class="cam-square" id="screen-sem2">
+                            <div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem">TLC SUD_02</div>
+                        </div>
+                        <div style="margin-top:10px; display:flex; gap:5px;">
+                            <input type="text" id="url-sem2" placeholder="IP Camera" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ccc">
+                            <button onclick="loadCam('sem2')" style="padding:0 15px; background:var(--pc-blue); color:white; border:none; border-radius:4px; cursor:pointer">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="emergency-area">
+            <button id="main-emergency" class="btn-emergency" onclick="handleEmergencyClick()">
+                🚨 EMERGENZA CHIUSURA STRADA 🚨
+            </button>
+        </div>
+
+        <!-- BLOCCO ISTRUZIONI PROTOCOLLO OPERATIVO -->
+        <div class="istruzioni-box">
+            <div style="background:var(--pc-blue); color:white; padding:10px 20px; font-weight:bold; text-transform:uppercase; font-size:0.9rem">
+                Protocollo Operativo TLC - Toscolano Maderno (v4.0)
+            </div>
+            <div class="istruzioni-grid">
+                <div class="istr-item">
+                    <strong>1. Video & Rete</strong>
+                    Monitorare router Teltonika e rete Tailscale. La sync NAS garantisce lo stato coerente tra i PC della centrale operativa.
+                </div>
+                <div class="istr-item">
+                    <strong>2. Transito (VAI)</strong>
+                    Il Verde spegne il Rosso (Relay OFF) e accende il Verde (OC ON). Lo stato viene inviato al NAS e loggato con nome operatore.
+                </div>
+                <div class="istr-item">
+                    <strong>3. Chiusura (ALT)</strong>
+                    Verde spento subito. Countdown 10s di sicurezza per sgombero area. Solo al termine si attiva il Rosso fisico (Relay ON).
+                </div>
+                <div class="istr-item">
+                    <strong>4. Emergenza</strong>
+                    L'attivazione forza i Rossi su tutte le unità. L'immissione del nome Operatore è obbligatoria per ogni manovra.
+                </div>
+            </div>
+        </div>
+
+        <div class="log-section" style="width:100%; max-width:1820px">
+            <div class="log-header" style="background: var(--pc-blue); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px 5px 0 0;">
+                <span>LOG EVENTI OPERATIVI (Sincronizzati)</span>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="downloadLog()" style="background:var(--pc-yellow); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:var(--pc-blue)">SCARICA (.TXT)</button>
+                    <button onclick="if(confirm('Cancellare cronologia log?')) {localStorage.removeItem('pc_tlc_logs'); document.getElementById('event-log').innerHTML=''; addLog('Log pulito.');}" style="background:var(--status-red); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:white">PULISCI</button>
+                </div>
+            </div>
+            <div id="event-log" class="log-area"></div>
+        </div>
+    </div>
+    
+    <footer style="background: var(--pc-blue); color: white; text-align: center; padding: 25px 0; border-top: 5px solid var(--pc-yellow); margin-top: 20px;">
+        <p>SISTEMA TLC v4.0 - REPARTO TLC PROTEZIONE CIVILE TOSCOLANO MADERNO - © 2025 Matteo Podavini</p>
+    </footer>
+    <script>
+        let isEmergency = false;
+        
+        // CONFIGURAZIONE RETE E NAS (TAILSCALE)
+        const netConfig = { 
+            sem1: '192.168.191.16', 
+            sem2: '192.168.191.17', 
+            nas: '100.111.26.63'
+        };
+
+        const auth = "username=admin&password=Adminadmin01";
+
+        // GESTIONE LOG CON OPERATORE E PERSISTENZA
+        function addLog(msg) {
+            const area = document.getElementById('event-log');
+            if (!area) return;
+            
+            const operatore = document.getElementById('operatore-name').value.trim() || "SISTEMA";
+            const now = new Date().toLocaleTimeString('it-IT');
+            
+            // Inserimento operatore nel tracciamento
+            const fullMsg = `<span style="color:#888">[${now}]</span> <b style="color:var(--pc-yellow)">[${operatore.toUpperCase()}]</b> ${msg}`;
+            
+            const entry = document.createElement('div');
+            entry.style.borderBottom = "1px solid #222";
+            entry.style.padding = "2px 0";
+            entry.innerHTML = fullMsg;
+            area.appendChild(entry);
+            area.scrollTop = 0;
+
+            // Salvataggio locale per persistenza post-aggiornamento
+            let logs = JSON.parse(localStorage.getItem('pc_tlc_logs') || "[]");
+            logs.push(fullMsg);
+            if (logs.length > 200) logs.shift(); 
+            localStorage.setItem('pc_tlc_logs', JSON.stringify(logs));
+        }
+
+        // COMANDI HARDWARE CGI TELTONIKA
+        async function setHardware(id, pin, action) {
+            const ip = netConfig[id];
+            const url = `http://${ip}/cgi-bin/output?${auth}&action=${action}&pin=${pin}`;
+            try {
+                await fetch(url, { mode: 'no-cors' });
+            } catch (e) { console.error(`Errore Hardware ${id}: ${e}`); }
+        }
+
+        async function syncNAS(unitId, newState) {
+            try {
+                await fetch(`${netConfig.nas}?unit=${unitId}&status=${newState}`, { method: 'GET', mode: 'no-cors' });
+            } catch (e) { console.warn("NAS Sync fallito"); }
+        }
+
+        // LOGICA SEMAFORICA CON CONTROLLO OPERATORE
+        function updateSem(id, type) {
+            const op = document.getElementById('operatore-name').value.trim();
+            if (!op) { 
+                alert("ATTENZIONE: Inserire il NOME OPERATORE prima di procedere."); 
+                return; 
+            }
+            if (isEmergency) return;
+
+            const c = document.getElementById(id);
+            const r = c.querySelector('.red'), o = c.querySelector('.orange'), g = c.querySelector('.green');
+            const lbl = document.getElementById('label-' + id);
+            
+            if (type === 'v') {
+                // VERDE: Relay OFF, OC ON
+                setHardware(id, 'relay', 'off'); 
+                setHardware(id, 'oc', 'on');
+                r.classList.remove('active'); g.classList.add('active');
+                lbl.className = 'status-label aperto'; lbl.innerText = "● APERTO";
+                addLog(`Unità ${id.toUpperCase()}: Apertura transito (VERDE).`);
+                syncNAS(id, 'aperto');
+            } 
+            else if (type === 'r' && g.classList.contains('active')) {
+                // ROSSO: OC OFF subito, Countdown 10s, poi Relay ON
+                setHardware(id, 'oc', 'off');
+                g.classList.remove('active'); o.classList.add('active');
+                lbl.className = 'status-label attesa';
+                document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
+                addLog(`Unità ${id.toUpperCase()}: Chiusura in corso (Sgombero 10s).`);
+                
+                let count = 10;
+                const timer = setInterval(() => {
+                    lbl.innerText = `● ATTESA (${count}s)`;
+                    if (--count < 0) {
+                        clearInterval(timer);
+                        setHardware(id, 'relay', 'on');
+                        o.classList.remove('active'); r.classList.add('active');
+                        lbl.className = 'status-label chiuso'; lbl.innerText = "● CHIUSO";
+                        document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
+                        addLog(`Unità ${id.toUpperCase()}: Chiusura completata (ROSSO).`);
+                        syncNAS(id, 'chiuso');
+                    }
+                }, 1000);
+            }
+        }
+
+        function handleEmergencyClick() {
+            const op = document.getElementById('operatore-name').value.trim();
+            if (!op) { 
+                alert("ATTENZIONE: Inserire il NOME OPERATORE per attivare l'emergenza."); 
+                return; 
+            }
+            if (isEmergency) document.getElementById('modalReset').style.display = 'flex';
+            else document.getElementById('modalEmergency').style.display = 'flex';
+        }
+
+        function actionEmergency(active) {
+            isEmergency = active;
+            closeModals();
+            const btn = document.getElementById('main-emergency');
+            if (isEmergency) {
+                btn.classList.add('active');
+                btn.innerText = "🚨 RESET SISTEMA (EMERGENZA ATTIVA) 🚨";
+                ['sem1', 'sem2'].forEach(id => {
+                    setHardware(id, 'oc', 'off'); 
+                    setHardware(id, 'relay', 'on');
+                    const c = document.getElementById(id);
+                    c.querySelector('.green').classList.remove('active');
+                    c.querySelector('.orange').classList.remove('active');
+                    c.querySelector('.red').classList.add('active');
+                    const lbl = document.getElementById('label-'+id);
+                    lbl.className = 'status-label emergenza'; lbl.innerText = '● EMERGENZA';
+                    syncNAS(id, 'emergenza');
+                });
+                addLog("⚠️ EMERGENZA: ATTIVATO BLOCCO ROSSO TOTALE.");
+            } else { 
+                addLog("Ripristino sistema in corso...");
+                setTimeout(() => location.reload(), 500); 
+            }
+        }
+
+        function closeModals() { 
+            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); 
+        }
+
+        function loadCam(id) {
+            const url = document.getElementById('url-' + id).value.trim();
+            if (url) {
+                const cleanUrl = url.startsWith('http') ? url : `http://${url}`;
+                document.getElementById('screen-' + id).innerHTML = `<iframe src="${cleanUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
+                localStorage.setItem('cam_url_' + id, url);
+            }
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('clock-display').innerText = now.toLocaleTimeString('it-IT');
+            document.getElementById('date-display').innerText = now.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+        }
+
+        async function checkNodes() {
+            for (let id in netConfig) {
+                if (id === 'nas') continue;
+                const el = document.getElementById('node-' + id);
+                try {
+                    const controller = new AbortController();
+                    setTimeout(() => controller.abort(), 2000);
+                    await fetch(`http://${netConfig[id]}`, { mode: 'no-cors', signal: controller.signal });
+                    el.innerText = "ONLINE"; el.className = "ping-box online-bg";
+                } catch (e) { 
+                    el.innerText = "OFFLINE"; el.className = "ping-box offline-bg"; 
+                }
+            }
+        }
+
+        function downloadLog() {
+            const blob = new Blob([document.getElementById('event-log').innerText], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `LOG_TLC_TOSCOLANO_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+        }
+
+        window.onload = () => {
+            updateDateTime(); setInterval(updateDateTime, 1000);
+            checkNodes(); setInterval(checkNodes, 10000);
+            
+            // Ripristino Nome Operatore
+            const savedOp = localStorage.getItem('last_op');
+            if (savedOp) document.getElementById('operatore-name').value = savedOp;
+            document.getElementById('operatore-name').addEventListener('input', (e) => {
+                localStorage.setItem('last_op', e.target.value.toUpperCase());
+            });
+
+            // Ripristino URL Camere
+            ['sem1', 'sem2'].forEach(id => {
+                const saved = localStorage.getItem('cam_url_' + id);
+                if (saved) { document.getElementById('url-' + id).value = saved; loadCam(id); }
+            });
+
+            // Ripristino Log da SessionStorage/LocalStorage
+            const area = document.getElementById('event-log');
+            const savedLogs = JSON.parse(localStorage.getItem('pc_tlc_logs') || "[]");
+            savedLogs.forEach(logHtml => {
+                const entry = document.createElement('div');
+                entry.style.borderBottom = "1px solid #222";
+                entry.innerHTML = logHtml;
+                area.appendChild(entry);
+            });
+
+            addLog("SISTEMA TLC v4.0 - Sessione Operativa Pronta.");
+        };
+    </script>
+</body>
+</html>
