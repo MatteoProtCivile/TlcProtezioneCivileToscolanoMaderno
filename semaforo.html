@@ -72,7 +72,6 @@
         .cam-square { width: 100%; height: 350px; background: #000; position: relative; border-radius: 6px; overflow: hidden; border: 2px solid #333; }
         .cam-square iframe { width: 100%; height: 100%; border: none; }
 
-        /* AREA EMERGENZA */
         .btn-emergency { 
             background: linear-gradient(135deg, #ff0000 0%, #990000 100%); 
             color: white; border: 5px solid #ffffff; padding: 25px 80px; 
@@ -92,7 +91,6 @@
             50% { background: #ffffff; color: #ff0000; transform: scale(1.02); }
         }
 
-        /* ISTRUZIONI E LOG */
         .istruzioni-box { width: 100%; max-width: 1820px; background: #fff; border: 2px solid var(--pc-blue); border-radius: 10px; overflow: hidden; margin-top: 10px; }
         .istruzioni-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
         .istr-item { font-size: 0.85rem; padding: 20px; border-right: 1px solid #ddd; line-height: 1.5; }
@@ -108,7 +106,6 @@
     </style>
 </head>
 <body>
-
     <!-- MODALI DI SICUREZZA -->
     <div id="modalEmergency" class="modal-overlay">
         <div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:500px; border: 8px solid var(--status-red);">
@@ -133,12 +130,10 @@
             <span class="label-pc">Protezione Civile</span>
             <h1 class="titolo-comune">TOSCOLANO MADERNO</h1>
         </div>
-
         <div class="op-box">
             <label>Operatore:</label>
             <input type="text" id="operatore-name" placeholder="NOME COGNOME" required>
         </div>
-
         <div class="datetime-display">
             <div id="clock-display">--:--:--</div>
             <span id="date-display" style="font-size:0.8rem; color:white">--/--/----</span>
@@ -179,6 +174,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- POSTAZIONE 02 -->
             <div class="control-module">
                 <div class="status-header">
@@ -219,127 +215,132 @@
             </button>
         </div>
 
-        <!-- BLOCCO ISTRUZIONI PROTOCOLLO OPERATIVO -->
+        <!-- ISTRUZIONI E LOG -->
         <div class="istruzioni-box">
             <div style="background:var(--pc-blue); color:white; padding:10px 20px; font-weight:bold; text-transform:uppercase; font-size:0.9rem">
                 Protocollo Operativo TLC - Toscolano Maderno (v4.0)
             </div>
             <div class="istruzioni-grid">
-                <div class="istr-item">
-                    <strong>1. Video & Rete</strong>
-                    Monitorare router Teltonika e rete Tailscale. La sync NAS garantisce lo stato coerente tra i PC della centrale operativa.
-                </div>
-                <div class="istr-item">
-                    <strong>2. Transito (VAI)</strong>
-                    Il Verde spegne il Rosso (Relay OFF) e accende il Verde (OC ON). Lo stato viene inviato al NAS e loggato con nome operatore.
-                </div>
-                <div class="istr-item">
-                    <strong>3. Chiusura (ALT)</strong>
-                    Verde spento subito. Countdown 10s di sicurezza per sgombero area. Solo al termine si attiva il Rosso fisico (Relay ON).
-                </div>
-                <div class="istr-item">
-                    <strong>4. Emergenza</strong>
-                    L'attivazione forza i Rossi su tutte le unità. L'immissione del nome Operatore è obbligatoria per ogni manovra.
-                </div>
+                <div class="istr-item"><strong>1. Video & Rete</strong> Monitorare router Teltonika e rete Tailscale. La sync NAS garantisce lo stato coerente tra i PC.</div>
+                <div class="istr-item"><strong>2. Transito (VAI)</strong> Verde spegne Rosso (Relay OFF) e accende Verde (OC ON). Stato loggato con operatore.</div>
+                <div class="istr-item"><strong>3. Chiusura (ALT)</strong> Verde spento subito. Countdown 10s di sicurezza. Poi Rosso fisico (Relay ON).</div>
+                <div class="istr-item"><strong>4. Emergenza</strong> Forza i Rossi su tutte le unità. Operatore obbligatorio per ogni manovra.</div>
             </div>
         </div>
 
         <div class="log-section" style="width:100%; max-width:1820px">
             <div class="log-header" style="background: var(--pc-blue); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px 5px 0 0;">
-                <span>LOG EVENTI OPERATIVI (Sincronizzati)</span>
+                <span>LOG EVENTI OPERATIVI (Sincronizzati 2025)</span>
                 <div style="display:flex; gap:10px;">
                     <button onclick="downloadLog()" style="background:var(--pc-yellow); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:var(--pc-blue)">SCARICA (.TXT)</button>
-                    <button onclick="if(confirm('Cancellare cronologia log?')) {localStorage.removeItem('pc_tlc_logs'); document.getElementById('event-log').innerHTML=''; addLog('Log pulito.');}" style="background:var(--status-red); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:white">PULISCI</button>
+                    <button onclick="if(confirm('Cancellare log?')) {localStorage.removeItem('pc_tlc_logs'); document.getElementById('event-log').innerHTML='';}" style="background:var(--status-red); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:white">PULISCI</button>
                 </div>
             </div>
             <div id="event-log" class="log-area"></div>
         </div>
     </div>
-    
-    <footer style="background: var(--pc-blue); color: white; text-align: center; padding: 25px 0; border-top: 5px solid var(--pc-yellow); margin-top: 20px;">
-        <p>SISTEMA TLC v4.0 - REPARTO TLC PROTEZIONE CIVILE TOSCOLANO MADERNO - © 2025 Matteo Podavini</p>
+    <footer style="background: var(--pc-blue); color: white; text-align: center; padding: 20px 0; border-top: 5px solid var(--pc-yellow); margin-top: 20px;">
+        SISTEMA TLC v4.0 - PROTEZIONE CIVILE TOSCOLANO MADERNO - © 2025 Matteo Podavini
     </footer>
     <script>
         let isEmergency = false;
+        let isLocking = { sem1: false, sem2: false }; // Evita sovrascritture durante il countdown di 10s
         
-        // CONFIGURAZIONE RETE E NAS (TAILSCALE)
         const netConfig = { 
             sem1: '192.168.191.10', 
             sem2: '192.168.191.17', 
             nas: '100.111.26.63:85/update.php'
         };
-
         const auth = "username=admin&password=Adminadmin01";
 
-        // GESTIONE LOG CON OPERATORE E PERSISTENZA
+        // LOGICA LOG
         function addLog(msg) {
             const area = document.getElementById('event-log');
-            if (!area) return;
-            
-            const operatore = document.getElementById('operatore-name').value.trim() || "SISTEMA";
+            const op = document.getElementById('operatore-name').value.trim() || "SISTEMA";
             const now = new Date().toLocaleTimeString('it-IT');
-            
-            // Inserimento operatore nel tracciamento
-            const fullMsg = `<span style="color:#888">[${now}]</span> <b style="color:var(--pc-yellow)">[${operatore.toUpperCase()}]</b> ${msg}`;
-            
+            const fullMsg = `<span style="color:#888">[${now}]</span> <b style="color:var(--pc-yellow)">[${op.toUpperCase()}]</b> ${msg}`;
             const entry = document.createElement('div');
             entry.style.borderBottom = "1px solid #222";
-            entry.style.padding = "2px 0";
             entry.innerHTML = fullMsg;
             area.appendChild(entry);
             area.scrollTop = 0;
-
-            // Salvataggio locale per persistenza post-aggiornamento
             let logs = JSON.parse(localStorage.getItem('pc_tlc_logs') || "[]");
             logs.push(fullMsg);
-            if (logs.length > 200) logs.shift(); 
+            if (logs.length > 200) logs.shift();
             localStorage.setItem('pc_tlc_logs', JSON.stringify(logs));
         }
 
-        // COMANDI HARDWARE CGI TELTONIKA
+        // HARDWARE & NAS SYNC
         async function setHardware(id, pin, action) {
-            const ip = netConfig[id];
-            const url = `http://${ip}/cgi-bin/output?${auth}&action=${action}&pin=${pin}`;
-            try {
-                await fetch(url, { mode: 'no-cors' });
-            } catch (e) { console.error(`Errore Hardware ${id}: ${e}`); }
+            const url = `http://${netConfig[id]}/cgi-bin/output?${auth}&action=${action}&pin=${pin}`;
+            try { await fetch(url, { mode: 'no-cors' }); } catch (e) {}
         }
 
         async function syncNAS(unitId, newState) {
-            try {
-                await fetch(`${netConfig.nas}?unit=${unitId}&status=${newState}`, { method: 'GET', mode: 'no-cors' });
-            } catch (e) { console.warn("NAS Sync fallito"); }
+            try { await fetch(`http://${netConfig.nas}?unit=${unitId}&status=${newState}`, { mode: 'no-cors' }); } catch (e) {}
         }
 
-        // LOGICA SEMAFORICA CON CONTROLLO OPERATORE
+        // POLLING: Ricezione stati dal NAS
+        setInterval(async () => {
+            if (isEmergency) return; // Non aggiornare se siamo in emergenza locale
+            
+            try {
+                // Chiamata al NAS per leggere lo stato (implementazione GET action=read)
+                const res = await fetch(`http://${netConfig.nas}?action=read`);
+                const data = await res.json(); 
+
+                data.forEach(item => {
+                    const id = item.unit; // 'sem1' o 'sem2'
+                    const nasStatus = item.status; // 'aperto', 'chiuso', 'emergenza'
+
+                    // Aggiorna solo se NON stiamo facendo un countdown locale e lo stato è diverso
+                    if (!isLocking[id]) {
+                        updateUI(id, nasStatus);
+                    }
+                });
+            } catch (e) { /* Silenzioso per non intasare la console */ }
+        }, 3000);
+
+        function updateUI(id, status) {
+            const lbl = document.getElementById('label-' + id);
+            const container = document.getElementById(id);
+            const r = container.querySelector('.red'), o = container.querySelector('.orange'), g = container.querySelector('.green');
+            
+            // Applica cambiamenti solo se necessari per evitare sfarfallio
+            if (status === 'aperto' && !g.classList.contains('active')) {
+                r.classList.remove('active'); o.classList.remove('active'); g.classList.add('active');
+                lbl.className = 'status-label aperto'; lbl.innerText = "● APERTO";
+            } else if (status === 'chiuso' && !r.classList.contains('active')) {
+                g.classList.remove('active'); o.classList.remove('active'); r.classList.add('active');
+                lbl.className = 'status-label chiuso'; lbl.innerText = "● CHIUSO";
+            } else if (status === 'emergenza') {
+                r.classList.add('active'); g.classList.remove('active'); o.classList.remove('active');
+                lbl.className = 'status-label emergenza'; lbl.innerText = '● EMERGENZA';
+            }
+        }
+
+        // COMANDI SEMAFORO
         function updateSem(id, type) {
             const op = document.getElementById('operatore-name').value.trim();
-            if (!op) { 
-                alert("ATTENZIONE: Inserire il NOME OPERATORE prima di procedere."); 
-                return; 
-            }
+            if (!op) { alert("Inserire NOME OPERATORE."); return; }
             if (isEmergency) return;
 
-            const c = document.getElementById(id);
-            const r = c.querySelector('.red'), o = c.querySelector('.orange'), g = c.querySelector('.green');
+            const c = document.getElementById(id), r = c.querySelector('.red'), o = c.querySelector('.orange'), g = c.querySelector('.green');
             const lbl = document.getElementById('label-' + id);
             
             if (type === 'v') {
-                // VERDE: Relay OFF, OC ON
-                setHardware(id, 'relay', 'off'); 
-                setHardware(id, 'oc', 'on');
+                setHardware(id, 'relay', 'off'); setHardware(id, 'oc', 'on');
                 r.classList.remove('active'); g.classList.add('active');
                 lbl.className = 'status-label aperto'; lbl.innerText = "● APERTO";
-                addLog(`Unità ${id.toUpperCase()}: Apertura transito (VERDE).`);
+                addLog(`Unità ${id.toUpperCase()}: Apertura transito.`);
                 syncNAS(id, 'aperto');
             } 
             else if (type === 'r' && g.classList.contains('active')) {
-                // ROSSO: OC OFF subito, Countdown 10s, poi Relay ON
+                isLocking[id] = true; // Blocca il polling per questa unità
                 setHardware(id, 'oc', 'off');
                 g.classList.remove('active'); o.classList.add('active');
                 lbl.className = 'status-label attesa';
                 document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
-                addLog(`Unità ${id.toUpperCase()}: Chiusura in corso (Sgombero 10s).`);
                 
                 let count = 10;
                 const timer = setInterval(() => {
@@ -350,19 +351,16 @@
                         o.classList.remove('active'); r.classList.add('active');
                         lbl.className = 'status-label chiuso'; lbl.innerText = "● CHIUSO";
                         document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
-                        addLog(`Unità ${id.toUpperCase()}: Chiusura completata (ROSSO).`);
+                        addLog(`Unità ${id.toUpperCase()}: Chiusura completata.`);
                         syncNAS(id, 'chiuso');
+                        isLocking[id] = false; // Sblocca il polling
                     }
                 }, 1000);
             }
         }
 
         function handleEmergencyClick() {
-            const op = document.getElementById('operatore-name').value.trim();
-            if (!op) { 
-                alert("ATTENZIONE: Inserire il NOME OPERATORE per attivare l'emergenza."); 
-                return; 
-            }
+            if (!document.getElementById('operatore-name').value.trim()) { alert("Inserire OPERATORE."); return; }
             if (isEmergency) document.getElementById('modalReset').style.display = 'flex';
             else document.getElementById('modalEmergency').style.display = 'flex';
         }
@@ -372,36 +370,35 @@
             closeModals();
             const btn = document.getElementById('main-emergency');
             if (isEmergency) {
-                btn.classList.add('active');
-                btn.innerText = "🚨 RESET SISTEMA (EMERGENZA ATTIVA) 🚨";
+                btn.classList.add('active'); btn.innerText = "🚨 RESET SISTEMA (EMERGENZA) 🚨";
                 ['sem1', 'sem2'].forEach(id => {
-                    setHardware(id, 'oc', 'off'); 
-                    setHardware(id, 'relay', 'on');
-                    const c = document.getElementById(id);
-                    c.querySelector('.green').classList.remove('active');
-                    c.querySelector('.orange').classList.remove('active');
-                    c.querySelector('.red').classList.add('active');
-                    const lbl = document.getElementById('label-'+id);
-                    lbl.className = 'status-label emergenza'; lbl.innerText = '● EMERGENZA';
+                    setHardware(id, 'oc', 'off'); setHardware(id, 'relay', 'on');
+                    updateUI(id, 'emergenza');
                     syncNAS(id, 'emergenza');
                 });
-                addLog("⚠️ EMERGENZA: ATTIVATO BLOCCO ROSSO TOTALE.");
-            } else { 
-                addLog("Ripristino sistema in corso...");
-                setTimeout(() => location.reload(), 500); 
-            }
+                addLog("⚠️ EMERGENZA: BLOCCO TOTALE ATTIVATO.");
+            } else { location.reload(); }
         }
 
-        function closeModals() { 
-            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); 
-        }
-
+        function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
+        
         function loadCam(id) {
             const url = document.getElementById('url-' + id).value.trim();
             if (url) {
-                const cleanUrl = url.startsWith('http') ? url : `http://${url}`;
-                document.getElementById('screen-' + id).innerHTML = `<iframe src="${cleanUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
-                localStorage.setItem('cam_url_' + id, url);
+                document.getElementById('screen-' + id).innerHTML = `<iframe src="${url.startsWith('http')?url:'http://'+url}" style="width:100%; height:100%; border:none;"></iframe>`;
+                localStorage.setItem('cam_url_'+id, url);
+            }
+        }
+
+        async function checkNodes() {
+            for (let id in netConfig) {
+                if (id === 'nas') continue;
+                const el = document.getElementById('node-' + id);
+                try {
+                    const ctrl = new AbortController(); setTimeout(()=>ctrl.abort(), 2000);
+                    await fetch(`http://${netConfig[id]}`, { mode: 'no-cors', signal: ctrl.signal });
+                    el.innerText = "ONLINE"; el.className = "ping-box online-bg";
+                } catch(e) { el.innerText = "OFFLINE"; el.className = "ping-box offline-bg"; }
             }
         }
 
@@ -411,61 +408,27 @@
             document.getElementById('date-display').innerText = now.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
         }
 
-        async function checkNodes() {
-            for (let id in netConfig) {
-                if (id === 'nas') continue;
-                const el = document.getElementById('node-' + id);
-                try {
-                    const controller = new AbortController();
-                    setTimeout(() => controller.abort(), 2000);
-                    await fetch(`http://${netConfig[id]}`, { mode: 'no-cors', signal: controller.signal });
-                    el.innerText = "ONLINE"; el.className = "ping-box online-bg";
-                } catch (e) { 
-                    el.innerText = "OFFLINE"; el.className = "ping-box offline-bg"; 
-                }
-            }
-        }
+        window.onload = () => {
+            updateDateTime(); setInterval(updateDateTime, 1000);
+            checkNodes(); setInterval(checkNodes, 10000);
+            const savedOp = localStorage.getItem('last_op');
+            if (savedOp) document.getElementById('operatore-name').value = savedOp;
+            document.getElementById('operatore-name').addEventListener('input', (e) => localStorage.setItem('last_op', e.target.value.toUpperCase()));
+            ['sem1', 'sem2'].forEach(id => {
+                const url = localStorage.getItem('cam_url_'+id);
+                if (url) { document.getElementById('url-'+id).value = url; loadCam(id); }
+            });
+            const logs = JSON.parse(localStorage.getItem('pc_tlc_logs') || "[]");
+            logs.forEach(l => { const e = document.createElement('div'); e.innerHTML = l; document.getElementById('event-log').appendChild(e); });
+        };
 
         function downloadLog() {
             const blob = new Blob([document.getElementById('event-log').innerText], {type: 'text/plain'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `LOG_TLC_TOSCOLANO_${new Date().toISOString().slice(0,10)}.txt`;
+            a.download = `LOG_TLC_2025.txt`;
             a.click();
         }
-
-        window.onload = () => {
-            updateDateTime(); setInterval(updateDateTime, 1000);
-            checkNodes(); setInterval(checkNodes, 10000);
-            
-            // Ripristino Nome Operatore
-            const savedOp = localStorage.getItem('last_op');
-            if (savedOp) document.getElementById('operatore-name').value = savedOp;
-            document.getElementById('operatore-name').addEventListener('input', (e) => {
-                localStorage.setItem('last_op', e.target.value.toUpperCase());
-            });
-
-            // Ripristino URL Camere
-            ['sem1', 'sem2'].forEach(id => {
-                const saved = localStorage.getItem('cam_url_' + id);
-                if (saved) { document.getElementById('url-' + id).value = saved; loadCam(id); }
-            });
-
-            // Ripristino Log da SessionStorage/LocalStorage
-            const area = document.getElementById('event-log');
-            const savedLogs = JSON.parse(localStorage.getItem('pc_tlc_logs') || "[]");
-            savedLogs.forEach(logHtml => {
-                const entry = document.createElement('div');
-                entry.style.borderBottom = "1px solid #222";
-                entry.innerHTML = logHtml;
-                area.appendChild(entry);
-            });
-
-            addLog("SISTEMA TLC v4.0 - Sessione Operativa Pronta.");
-        };
     </script>
 </body>
 </html>
-
-
-
