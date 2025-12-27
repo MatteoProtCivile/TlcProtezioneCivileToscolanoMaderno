@@ -147,7 +147,7 @@
 
     <div class="main-container">
         <div class="row-controlli">
-            <!-- UNITA 01 - NORD -->
+            <!-- POSTAZIONE 01 -->
             <div class="control-module">
                 <div class="status-header">
                     <div style="display:flex; align-items:center; gap:10px">
@@ -179,7 +179,7 @@
                     </div>
                 </div>
             </div>
-            <!-- UNITA 02 - SUD -->
+            <!-- POSTAZIONE 02 -->
             <div class="control-module">
                 <div class="status-header">
                     <div style="display:flex; align-items:center; gap:10px">
@@ -264,9 +264,9 @@
         
         // CONFIGURAZIONE RETE E NAS (TAILSCALE)
         const netConfig = { 
-            sem1: '192.168.191.16', 
+            sem1: '192.168.191.10', 
             sem2: '192.168.191.17', 
-            nas: '100.111.26.63'
+            nas: '100.111.26.63:85/update.php'
         };
 
         const auth = "username=admin&password=Adminadmin01";
@@ -466,3 +466,4 @@
     </script>
 </body>
 </html>
+
