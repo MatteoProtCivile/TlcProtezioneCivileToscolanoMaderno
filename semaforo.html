@@ -372,7 +372,7 @@
         if (isEmergency || isAutomaticMode) return;
         if (type === 'v') { setHardware(id, 'relay', 'off', ''); setHardware(id, 'oc', 'on', ''); updateUI(id, 'VERDE'); addLog(`Unità ${id.toUpperCase()}: Apertura MANUALE.`); }
         else if (type === 'r') {
-            updateUI(id, 'ARANCIO'); setHardware(id, 'oc', 'off', ''); addLog(`Unità ${id.toUpperCase()}: Fase Arancio (10s).`);
+            updateUI(id, 'ARANCIO'); setHardware(id, 'oc', 'off', ''); addLog(`Unità ${id.toUpperCase()}: Fase Arancio (5s).`);
 			// TEMPO ARANCIONE ---
             setTimeout(() => { setHardware(id, 'relay', 'on', ''); updateUI(id, 'ROSSO'); addLog(`Unità ${id.toUpperCase()}: Chiusura MANUALE.`); }, 5000);
         }
@@ -470,3 +470,4 @@
 </script>
 </body>
 </html>
+
