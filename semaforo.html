@@ -186,9 +186,12 @@
     <div class="row-controlli">
         <!-- UNITA 01 - NORD -->
         <div class="control-module">
-            <div class="status-header">
-                <div style="display:flex; align-items:center; gap:10px">
-                    <span>POSTAZIONE - 01 </span>
+    <div class="status-header">
+        <div style="display:flex; align-items:center; gap:10px">
+            <!-- Aggiunto attributo contenteditable -->
+            <span id="nome-postazione" contenteditable="true" style="border-bottom: 1px dashed #666; cursor: pointer;">
+                POSTAZIONE - 01
+            </span>
                     <div id="node-sem1" class="ping-box offline-bg">OFFLINE</div>
                 </div>
                 <span id="label-sem1" class="status-label chiuso">● CHIUSO</span>
@@ -219,9 +222,12 @@
 
         <!-- UNITA 02 - SUD -->
         <div class="control-module">
-            <div class="status-header">
-                <div style="display:flex; align-items:center; gap:10px">
-                    <span>POSTAZIONE - 02</span>
+    <div class="status-header">
+        <div style="display:flex; align-items:center; gap:10px">
+            <!-- Aggiunto attributo contenteditable -->
+            <span id="nome-postazione" contenteditable="true" style="border-bottom: 1px dashed #666; cursor: pointer;">
+                POSTAZIONE - 02
+            </span>
                     <div id="node-sem2" class="ping-box offline-bg">OFFLINE</div>
                 </div>
                 <span id="label-sem2" class="status-label chiuso">● CHIUSO</span>
@@ -470,4 +476,5 @@
 </script>
 </body>
 </html>
+
 
