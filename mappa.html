@@ -42,49 +42,53 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
-        // --- LIVELLI MAPPA ---
-        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        });
+    // Mappa Stradale
+    var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    });
 
-        var satellite = L.tileLayer('server.arcgisonline.com{z}/{y}/{x}', {
-            attribution: '&copy; Esri &mdash; Satellite 2025'
-        });
+    // Mappa Satellitare (Google - Solitamente più stabile)
+    var satellite = L.tileLayer('https://{s}{x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps Satellite'
+    });
 
-        // --- INIZIALIZZAZIONE ---
-        var map = L.map('map', {
-            center: [41.8719, 12.5674],
-            zoom: 6,
-            layers: [stradale] // Parte con la stradale
-        });
+    var map = L.map('map', {
+        center: [41.8719, 12.5674],
+        zoom: 6,
+        layers: [stradale] 
+    });
 
-        // Controllo livelli (in alto a destra)
-        var baseMaps = {
-            "Mappa Stradale": stradale,
-            "Satellite": satellite
-        };
-        L.control.layers(baseMaps).addTo(map);
+    var baseMaps = {
+        "Mappa Stradale": stradale,
+        "Satellite": satellite
+    };
 
-        var markers = {};
+    L.control.layers(baseMaps).addTo(map);
 
-        function rilevaPosizione() {
-            if (!navigator.geolocation) { alert("GPS non supportato."); return; }
-            navigator.geolocation.getCurrentPosition(function(p) {
-                document.getElementById('lat').value = p.coords.latitude.toFixed(6);
-                document.getElementById('lng').value = p.coords.longitude.toFixed(6);
-            }, function(e) { alert("Errore GPS: " + e.message); });
+    var markers = {};
+
+    function rilevaPosizione() {
+        if (!navigator.geolocation) { alert("GPS non supportato."); return; }
+        navigator.geolocation.getCurrentPosition(function(p) {
+            document.getElementById('lat').value = p.coords.latitude.toFixed(6);
+            document.getElementById('lng').value = p.coords.longitude.toFixed(6);
+        }, function(e) { alert("Errore GPS: " + e.message); });
+    }
+
+    function aggiungiPunto() {
+        var lat = document.getElementById('lat').value;
+        var lng = document.getElementById('lng').value;
+        var nome = document.getElementById('poiName').value || "POI";
+        if (lat && lng) {
+            if (markers[nome]) map.removeLayer(markers[nome]);
+            markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup(nome).openPopup();
+            map.setView([lat, lng], 15);
         }
+    }
+</script>
 
-        function aggiungiPunto() {
-            var lat = document.getElementById('lat').value;
-            var lng = document.getElementById('lng').value;
-            var nome = document.getElementById('poiName').value || "POI";
-            if (lat && lng) {
-                if (markers[nome]) map.removeLayer(markers[nome]);
-                markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup(nome).openPopup();
-                map.setView([lat, lng], 15);
-            }
-        }
-    </script>
 </body>
 </html>
+
