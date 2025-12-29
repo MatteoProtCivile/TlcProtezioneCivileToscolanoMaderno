@@ -1,127 +1,18 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <title>Mappa Satellitare Sincronizzata 2025</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="unpkg.com" />
-    <style>
-        /* IMPORTANTE: L'altezza deve essere definita o la mappa non appare */
-        #map { height: 600px; width: 100%; border-radius: 12px; border: 2px solid #007bff; margin-top: 15px; background: #f0f0f0; }
-        body { font-family: sans-serif; margin: 20px; background: #fafafa; }
-        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; width: 150px; }
-        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
-        .btn-add { background: #007bff; color: white; }
-        .btn-geo { background: #28a745; color: white; }
-        .status-bar { font-size: 0.85em; color: #555; margin-top: 10px; padding-top: 5px; border-top: 1px solid #eee; }
-    </style>
-</head>
-<body>
-
-    <div class="controls">
-        <h3>📍 Mappa POI Sincronizzata (NAS)</h3>
-        <input type="text" id="poiName" placeholder="Nome (es. SEM1)">
-        <input type="text" id="lat" placeholder="Latitudine">
-        <input type="text" id="lng" placeholder="Longitudine">
-        <br>
-        <button class="btn-geo" onclick="rilevaPosizione()">📍 Mia Posizione</button>
-        <button class="btn-add" onclick="salvaSuNas()">Salva e Condividi</button>
-        <div id="sync-info" class="status-bar">Stato: Avvio sistema...</div>
-    </div>
-
-    <div id="map"></div>
-
-    <!-- Leaflet JS -->
-    <script src="unpkg.com"></script>
-    
-    <script>
-        // CONFIGURAZIONE NAS (Assicurati che IP e porta siano corretti)
-        const NAS_ENDPOINT = "100.111.26.63:85/update.php";
-        var markers = {};
-
-        // --- INIZIALIZZAZIONE LIVELLI MAPPA ---
-        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM' });
-        
-        var satellite = L.tileLayer('https://{s}{x}&y={y}&z={z}', {
-            maxZoom: 20, 
-            subdomains:['mt0','mt1','mt2','mt3'], 
-            attribution: 'Google Satellite'
+// Funzione da eseguire all'avvio per caricare i punti esistenti dal NAS
+async function caricaPuntiDalNAS() {
+    try {
+        const response = await fetch(`http://${netConfig.nas}?action=get_all`);
+        const punti = await response.json(); // Il NAS deve restituire un array JSON
+        punti.forEach(p => {
+            aggiornaMarkerSullaMappa(p.nome, p.lat, p.lng);
         });
+    } catch (e) {
+        console.log("Nessun punto caricato dal NAS.");
+    }
+}
 
-        // Creazione Mappa
-        var map = L.map('map', {
-            center: [41.8719, 12.5674],
-            zoom: 6,
-            layers: [stradale]
-        });
-
-        var baseMaps = { "Mappa Stradale": stradale, "Satellite": satellite };
-        L.control.layers(baseMaps).addTo(map);
-
-        // --- FUNZIONE: RILEVA GPS ---
-        function rilevaPosizione() {
-            if (!navigator.geolocation) { alert("GPS non supportato"); return; }
-            navigator.geolocation.getCurrentPosition(p => {
-                document.getElementById('lat').value = p.coords.latitude.toFixed(6);
-                document.getElementById('lng').value = p.coords.longitude.toFixed(6);
-            }, e => alert("Errore GPS: " + e.message));
-        }
-
-        // --- FUNZIONE: SALVA SUL NAS ---
-        async function salvaSuNas() {
-            const nome = document.getElementById('poiName').value || "Punto";
-            const lat = document.getElementById('lat').value;
-            const lng = document.getElementById('lng').value;
-
-            if (!lat || !lng) { alert("Coordinate mancanti!"); return; }
-
-            try {
-                // Chiamata all'azione 'save' definita nel PHP
-                const url = `${NAS_ENDPOINT}?action=save&nome=${encodeURIComponent(nome)}&lat=${lat}&lng=${lng}`;
-                await fetch(url, { mode: 'no-cors' }); 
-                
-                disegnaMarker(nome, lat, lng); // Aggiorna subito in locale
-                document.getElementById('sync-info').innerText = `Salvato: ${nome} alle ${new Date().toLocaleTimeString()}`;
-            } catch (e) {
-                console.error("Errore invio NAS:", e);
-            }
-        }
-
-        // --- FUNZIONE: POLLING (LEGGE DAL NAS) ---
-        async function pollingNas() {
-            try {
-                // Chiamata all'azione 'get_all_poi' definita nel PHP
-                const response = await fetch(`${NAS_ENDPOINT}?action=get_all_poi`);
-                if (!response.ok) return;
-                
-                const punti = await response.json();
-                if (Array.isArray(punti)) {
-                    punti.forEach(p => {
-                        disegnaMarker(p.nome, p.lat, p.lng);
-                    });
-                    document.getElementById('sync-info').innerText = `Sincronizzato: ${new Date().toLocaleTimeString()}`;
-                }
-            } catch (e) {
-                // Questo accade se il NAS non ha ancora punti salvati o il file non esiste
-                console.log("Polling in corso...");
-            }
-        }
-
-        function disegnaMarker(nome, lat, lng) {
-            // Se il marker esiste già, lo rimuoviamo per non duplicarlo
-            if (markers[nome]) map.removeLayer(markers[nome]);
-            
-            // Creiamo il marker e lo aggiungiamo
-            markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup(`<b>${nome}</b>`);
-        }
-
-        // --- AVVIO AUTOMATICO ---
-        window.onload = () => {
-            pollingNas(); // Carica subito i dati esistenti
-            setInterval(pollingNas, 10000); // Aggiorna ogni 10 secondi
-        };
-    </script>
-</body>
-</html>
-
+// Esegui il caricamento all'apertura
+window.onload = () => {
+    caricaPuntiDalNAS();
+    // ... altre funzioni di avvio ...
+};
