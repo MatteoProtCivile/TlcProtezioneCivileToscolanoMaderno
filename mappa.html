@@ -2,93 +2,116 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Mappa Satellitare TLC 2025</title>
-    <!-- 1. CSS di Leaflet (Sempre PRIMA degli script) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Mappa Sincronizzata NAS 2025</title>
+    <link rel="stylesheet" href="unpkg.com" />
     <style>
-        /* IMPORTANTE: Senza altezza la mappa sparisce */
-        #map { 
-            height: 550px; 
-            width: 100%; 
-            border-radius: 12px; 
-            border: 2px solid #007bff; 
-            margin-top: 15px;
-            background: #f0f0f0; /* Grigio di sfondo se la mappa non carica */
-        }
-        body { font-family: sans-serif; margin: 20px; background: #fafafa; }
+        body { font-family: sans-serif; margin: 20px; background: #f4f4f4; }
+        #map { height: 550px; width: 100%; border-radius: 12px; border: 2px solid #007bff; margin-top: 15px; }
         .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+        .input-group { margin-bottom: 10px; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; width: 180px; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
         .btn-add { background: #007bff; color: white; }
-        .btn-geo { background: #28a745; color: white; }
+        .btn-geo { background: #28a745; color: white; margin-right: 5px; }
+        .status-sync { font-size: 0.8em; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <h3>📍 Controllo POI - Visualizzazione 2025</h3>
-        <input type="text" id="poiName" placeholder="Nome (es. SEM1)">
-        <input type="text" id="lat" placeholder="Latitudine">
-        <input type="text" id="lng" placeholder="Longitudine">
-        <br>
+        <h3>📍 Mappa POI Sincronizzata NAS</h3>
+        <div class="input-group">
+            <input type="text" id="poiName" placeholder="Nome Punto (es. SEM1)">
+            <input type="text" id="lat" placeholder="Latitudine">
+            <input type="text" id="lng" placeholder="Longitudine">
+        </div>
         <button class="btn-geo" onclick="rilevaPosizione()">📍 Rileva mia posizione</button>
-        <button class="btn-add" onclick="aggiungiPunto()">Aggiungi sulla Mappa</button>
+        <button class="btn-add" onclick="aggiungiESincronizza()">Salva e Condividi</button>
+        <div id="sync-status" class="status-sync">Sincronizzazione pronta.</div>
     </div>
 
-    <!-- Il contenitore della mappa -->
     <div id="map"></div>
 
-    <!-- 2. JavaScript di Leaflet (Sempre DOPO il CSS) -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+    <script src="unpkg.com"></script>
     <script>
-    // Mappa Stradale
-    var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-    });
+        // CONFIGURAZIONE
+        const NAS_URL = "100.111.26.63";
+        var markers = {};
 
-    // Mappa Satellitare (Google - Solitamente più stabile)
-    var satellite = L.tileLayer('https://{s}{x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: '&copy; Google Maps Satellite'
-    });
+        // --- INIZIALIZZAZIONE MAPPE ---
+        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM' });
+        
+        var satellite = L.tileLayer('https://{s}{x}&y={y}&z={z}', {
+            maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Google Satellite'
+        });
 
-    var map = L.map('map', {
-        center: [41.8719, 12.5674],
-        zoom: 6,
-        layers: [stradale] 
-    });
+        var map = L.map('map', { center: [41.8719, 12.5674], zoom: 6, layers: [stradale] });
+        var baseMaps = { "Mappa Stradale": stradale, "Satellite": satellite };
+        L.control.layers(baseMaps).addTo(map);
 
-    var baseMaps = {
-        "Mappa Stradale": stradale,
-        "Satellite": satellite
-    };
-
-    L.control.layers(baseMaps).addTo(map);
-
-    var markers = {};
-
-    function rilevaPosizione() {
-        if (!navigator.geolocation) { alert("GPS non supportato."); return; }
-        navigator.geolocation.getCurrentPosition(function(p) {
-            document.getElementById('lat').value = p.coords.latitude.toFixed(6);
-            document.getElementById('lng').value = p.coords.longitude.toFixed(6);
-        }, function(e) { alert("Errore GPS: " + e.message); });
-    }
-
-    function aggiungiPunto() {
-        var lat = document.getElementById('lat').value;
-        var lng = document.getElementById('lng').value;
-        var nome = document.getElementById('poiName').value || "POI";
-        if (lat && lng) {
-            if (markers[nome]) map.removeLayer(markers[nome]);
-            markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup(nome).openPopup();
-            map.setView([lat, lng], 15);
+        // --- FUNZIONE 1: RILEVA GPS PC ---
+        function rilevaPosizione() {
+            if (!navigator.geolocation) return alert("GPS non supportato");
+            navigator.geolocation.getCurrentPosition(p => {
+                document.getElementById('lat').value = p.coords.latitude.toFixed(6);
+                document.getElementById('lng').value = p.coords.longitude.toFixed(6);
+            });
         }
-    }
-</script>
 
+        // --- FUNZIONE 2: AGGIUNGI LOCALE E INVIA AL NAS ---
+        async function aggiungiESincronizza() {
+            const nome = document.getElementById('poiName').value || "Punto";
+            const lat = document.getElementById('lat').value;
+            const lng = document.getElementById('lng').value;
+
+            if (!lat || !lng) return alert("Inserisci coordinate!");
+
+            // Disegna subito sulla mappa locale
+            disegnaMarker(nome, lat, lng);
+
+            // Invia al NAS (Sincronizzazione in uscita)
+            try {
+                const params = new URLSearchParams({
+                    action: 'save_poi',
+                    nome: nome,
+                    lat: lat,
+                    lng: lng
+                });
+                await fetch(`${NAS_URL}?${params.toString()}`, { mode: 'no-cors' });
+                document.getElementById('sync-status').innerText = "Ultimo invio: " + new Date().toLocaleTimeString();
+            } catch (e) {
+                console.error("Errore invio NAS:", e);
+            }
+        }
+
+        // --- FUNZIONE 3: CARICA DA NAS (POLLING) ---
+        async function caricaDatiDalNAS() {
+            try {
+                // Chiamata al NAS per ottenere tutti i POI salvati dagli altri PC
+                const response = await fetch(`${NAS_URL}?action=get_pois`);
+                if (!response.ok) return;
+                
+                const punti = await response.json();
+                punti.forEach(p => {
+                    disegnaMarker(p.nome, p.lat, p.lng);
+                });
+                document.getElementById('sync-status').innerText = "Sincronizzato: " + new Date().toLocaleTimeString();
+            } catch (e) {
+                // Se update.php non restituisce ancora JSON, l'errore apparirà qui
+                console.log("In attesa di dati validi dal NAS...");
+            }
+        }
+
+        function disegnaMarker(nome, lat, lng) {
+            if (markers[nome]) map.removeLayer(markers[nome]);
+            markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup("<b>"+nome+"</b>");
+        }
+
+        // --- AVVIO E POLLING ---
+        window.onload = () => {
+            caricaDatiDalNAS(); // Carica subito all'avvio
+            setInterval(caricaDatiDalNAS, 10000); // Controlla nuovi POI ogni 10 secondi
+        };
+    </script>
 </body>
 </html>
-
