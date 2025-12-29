@@ -372,17 +372,51 @@
     }
 
     // --- LOGICA MANUALE (Invariato) ---
-    function updateSem(id, type) {
-        const op = document.getElementById('operatore-name').value.trim();
-        if (!op) { alert("ATTENZIONE: Inserire il NOME OPERATORE."); return; }
-        if (isEmergency || isAutomaticMode) return;
-        if (type === 'v') { setHardware(id, 'relay', 'off', ''); setHardware(id, 'oc', 'on', ''); updateUI(id, 'VERDE'); addLog(`Unità ${id.toUpperCase()}: Apertura MANUALE.`); }
-        else if (type === 'r') {
-            updateUI(id, 'ARANCIO'); setHardware(id, 'oc', 'off', ''); addLog(`Unità ${id.toUpperCase()}: Fase Arancio (5s).`);
-			// TEMPO ARANCIONE ---
-            setTimeout(() => { setHardware(id, 'relay', 'on', ''); updateUI(id, 'ROSSO'); addLog(`Unità ${id.toUpperCase()}: Chiusura MANUALE.`); }, 5000);
-        }
+    // --- LOGICA MANUALE CORRETTA ---
+function updateSem(id, type) {
+    const op = document.getElementById('operatore-name').value.trim();
+    if (!op) { alert("ATTENZIONE: Inserire il NOME OPERATORE."); return; }
+    if (isEmergency || isAutomaticMode) return;
+
+    // Recuperiamo l'elemento del semaforo e controlliamo se il rosso è già attivo
+    const semElement = document.getElementById(id);
+    const isRedActive = semElement.querySelector('.red').classList.contains('active');
+    const isGreenActive = semElement.querySelector('.green').classList.contains('active');
+
+    if (type === 'v') {
+        // Se è già verde, ignoriamo il comando
+        if (isGreenActive) return;
+
+        setHardware(id, 'relay', 'off', ''); 
+        setHardware(id, 'oc', 'on', ''); 
+        updateUI(id, 'VERDE'); 
+        addLog(`Unità ${id.toUpperCase()}: Apertura MANUALE.`); 
     }
+    else if (type === 'r') {
+        // CORREZIONE: Se il semaforo è già ROSSO, interrompiamo la funzione
+        // impedendo che passi all'arancione
+        if (isRedActive) {
+            console.log(`Unità ${id.toUpperCase()} già in rosso. Azione annullata.`);
+            return; 
+        }
+
+        // Se non era rosso (era verde o arancio), allora eseguiamo la chiusura
+        updateUI(id, 'ARANCIO'); 
+        setHardware(id, 'oc', 'off', ''); 
+        addLog(`Unità ${id.toUpperCase()}: Fase Arancio (5s).`);
+
+        // TEMPO ARANCIONE ---
+        setTimeout(() => { 
+            // Controllo di sicurezza: se nel frattempo non è scattata un'emergenza
+            if (!isEmergency) {
+                setHardware(id, 'relay', 'on', ''); 
+                updateUI(id, 'ROSSO'); 
+                addLog(`Unità ${id.toUpperCase()}: Chiusura MANUALE.`); 
+            }
+        }, 5000);
+    }
+}
+
 
     // --- LOGICA AUTOMAZIONE (CON COUNTDOWN INTEGRATO) ---
     function toggleAutomation() {
@@ -476,5 +510,4 @@
 </script>
 </body>
 </html>
-
 
