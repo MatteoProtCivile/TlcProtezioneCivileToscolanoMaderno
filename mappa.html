@@ -2,82 +2,110 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Mappa Interattiva POI 2025</title>
+    <title>Controllo TLC & Mappa Satellitare 2025</title>
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="unpkg.com" />
     <style>
-        #map { height: 500px; width: 100%; border-radius: 8px; margin-top: 10px; }
-        .controls { background: #f4f4f4; padding: 15px; border-radius: 8px; font-family: sans-serif; }
-        input { margin: 5px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 6px 12px; cursor: pointer; border: none; border-radius: 4px; margin: 5px; }
+        body { font-family: sans-serif; margin: 20px; background: #ececec; }
+        #map { height: 500px; width: 100%; border-radius: 12px; border: 2px solid #ccc; margin-top: 15px; }
+        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 10px; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 180px; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
         .btn-add { background: #007bff; color: white; }
-        .btn-geo { background: #28a745; color: white; } /* Verde per la posizione */
+        .btn-add:hover { background: #0056b3; }
+        .btn-geo { background: #28a745; color: white; margin-right: 5px; }
+        .btn-geo:hover { background: #218838; }
+        h3 { margin-top: 0; color: #333; }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <h3>Gestione POI</h3>
-        <input type="text" id="lat" placeholder="Latitudine">
-        <input type="text" id="lng" placeholder="Longitudine">
-        <input type="text" id="poiName" placeholder="Nome (es. SEM1 o PC)">
+        <h3>📍 Gestione Punti di Interesse (POI)</h3>
+        <div class="input-group">
+            <input type="text" id="poiName" placeholder="Nome Punto (es. SEM1)">
+            <input type="text" id="lat" placeholder="Latitudine">
+            <input type="text" id="lng" placeholder="Longitudine">
+        </div>
         
-        <br>
-        <!-- Pulsante per rilevare la posizione del PC -->
-        <button class="btn-geo" onclick="rilevaPosizione()">📍 Rileva la mia posizione</button>
-        <!-- Pulsante per aggiungere alla mappa -->
+        <button class="btn-geo" onclick="rilevaPosizione()">📍 Rileva mia posizione</button>
         <button class="btn-add" onclick="aggiungiPunto()">Aggiungi sulla Mappa</button>
     </div>
 
+    <!-- Contenitore Mappa -->
     <div id="map"></div>
 
+    <!-- Leaflet JS -->
     <script src="unpkg.com"></script>
     <script>
-        var map = L.map('map').setView([41.8719, 12.5674], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // --- CONFIGURAZIONE MAPPE (Stradale e Satellitare) ---
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+        });
 
-        var markers = {}; // Usiamo un oggetto per gestire più punti (es. SEM1, SEM2, PC)
+        var satellite = L.tileLayer('server.arcgisonline.com{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        });
 
-        // FUNZIONE PER RILEVARE LA POSIZIONE DEL PC
+        // Inizializza la mappa con lo strato stradale
+        var map = L.map('map', {
+            center: [41.8719, 12.5674],
+            zoom: 6,
+            layers: [osm]
+        });
+
+        // Aggiunge il selettore in alto a destra
+        var baseMaps = {
+            "Mappa Stradale": osm,
+            "Satellite": satellite
+        };
+        L.control.layers(baseMaps).addTo(map);
+
+        // Oggetto per contenere i marker (permette di averne più di uno)
+        var markers = {};
+
+        // --- FUNZIONE: RILEVA POSIZIONE PC ---
         function rilevaPosizione() {
             if (!navigator.geolocation) {
-                alert("Il tuo browser non supporta la geolocalizzazione.");
+                alert("Il browser non supporta la geolocalizzazione.");
                 return;
             }
 
             navigator.geolocation.getCurrentPosition(function(position) {
-                // Inserisce i dati rilevati nei campi input
                 document.getElementById('lat').value = position.coords.latitude.toFixed(6);
                 document.getElementById('lng').value = position.coords.longitude.toFixed(6);
-                // Suggerisce un nome predefinito se vuoto
+                
                 if(!document.getElementById('poiName').value) {
-                    document.getElementById('poiName').value = "Mia Posizione";
+                    document.getElementById('poiName').value = "Mio PC";
                 }
-                alert("Posizione rilevata con successo!");
+                alert("Posizione rilevata!");
             }, function(error) {
-                alert("Errore nel rilevamento: " + error.message);
+                alert("Errore GPS: " + error.message + ". Assicurati di usare HTTPS o localhost.");
             });
         }
 
-        // FUNZIONE PER AGGIUNGERE IL PUNTO (MANUALE O RILEVATO)
+        // --- FUNZIONE: AGGIUNGI PUNTO SULLA MAPPA ---
         function aggiungiPunto() {
             var lat = document.getElementById('lat').value;
             var lng = document.getElementById('lng').value;
-            var nome = document.getElementById('poiName').value || "Nuovo Punto";
+            var nome = document.getElementById('poiName').value || "Punto Senza Nome";
 
             if (lat && lng) {
-                // Se esiste già un marker con lo stesso nome, lo rimuoviamo per aggiornarlo
-                if (markers[nome]) map.removeLayer(markers[nome]);
+                // Se esiste già un marker con lo stesso nome, lo rimuove prima di aggiornarlo
+                if (markers[nome]) {
+                    map.removeLayer(markers[nome]);
+                }
 
-                // Crea il nuovo marker e lo aggiunge alla collezione
+                // Crea il marker, lo aggiunge alla mappa e lo salva nell'oggetto markers
                 markers[nome] = L.marker([lat, lng]).addTo(map)
-                    .bindPopup("<b>" + nome + "</b>")
+                    .bindPopup("<b>" + nome + "</b><br>Lat: " + lat + "<br>Lng: " + lng)
                     .openPopup();
                 
-                map.setView([lat, lng], 15); // Zoom più ravvicinato
+                // Centra la mappa sul punto aggiunto
+                map.setView([lat, lng], 16); 
             } else {
-                alert("Inserisci coordinate o usa il tasto Rileva.");
+                alert("Inserisci Latitudine e Longitudine (o usa 'Rileva').");
             }
         }
     </script>
