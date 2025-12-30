@@ -3,230 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TLC Command Center - Toscolano Maderno</title>
+    <title>Centrale Operativa TLC - Toscolano Maderno</title>
 
-    <!-- Leaflet CSS -->
+    <!-- FONDAMENTALE: CSS di Leaflet per vedere i pulsanti e la mappa -->
     <link rel="stylesheet" href="unpkg.com" />
-    <!-- Google Fonts per un look tecnologico -->
-    <link href="fonts.googleapis.com" rel="stylesheet">
     
     <style>
-        :root {
-            --pc-blue: #002366;
-            --pc-yellow: #ffcc00;
-            --tech-cyan: #00f2ff;
-            --bg-dark: #1a1a2e;
-            --panel-bg: #16213e;
-        }
-
         body { 
-            font-family: 'Roboto Mono', monospace; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             margin: 0; 
             padding: 0; 
-            background-color: var(--bg-dark); 
-            color: white;
-            overflow-x: hidden;
+            background-color: #e9ecef; 
         }
         
-        /* Header Hi-Tech */
+        /* Testata sobria e professionale */
         .pc-header {
-            background: linear-gradient(90deg, var(--pc-blue) 0%, #0f3460 100%);
-            color: var(--pc-yellow); 
-            padding: 20px;
-            border-bottom: 3px solid var(--pc-yellow);
+            background-color: #003399; 
+            color: #ffffff; 
+            padding: 12px 20px;
+            border-bottom: 4px solid #ffcc00;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .pc-header h1 { 
-            margin: 0; 
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem; 
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
-        }
+        .pc-header h1 { margin: 0; font-size: 1.1rem; letter-spacing: 1px; }
 
-        .status-badge {
+        .status {
             font-size: 0.8rem;
-            background: rgba(0, 242, 255, 0.1);
-            padding: 5px 12px;
-            border: 1px solid var(--tech-cyan);
-            border-radius: 20px;
-            color: var(--tech-cyan);
-            animation: pulse 2s infinite;
+            background: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
         }
 
-        /* Pannello Controlli */
+        /* Area Comandi */
         .controls {
-            padding: 20px;
-            background: var(--panel-bg);
+            padding: 15px;
+            background: white;
             display: flex;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
-            justify-content: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #dee2e6;
         }
 
         input { 
-            padding: 10px; 
-            background: #0f3460;
-            border: 1px solid #4e6e8e; 
-            color: white;
+            padding: 8px 12px; 
+            border: 1px solid #ced4da; 
             border-radius: 4px;
-            outline: none;
-            transition: 0.3s;
+            font-size: 0.9rem;
         }
-
-        input:focus { border-color: var(--tech-cyan); box-shadow: 0 0 8px var(--tech-cyan); }
 
         button { 
-            padding: 10px 20px; 
-            background: var(--pc-blue); 
+            padding: 8px 16px; 
+            background: #003399; 
             color: white; 
-            border: 1px solid var(--tech-cyan); 
-            cursor: pointer; 
-            font-weight: bold; 
-            text-transform: uppercase;
-            transition: 0.3s;
+            border: none; 
             border-radius: 4px;
+            cursor: pointer; 
+            font-weight: 600;
+            transition: background 0.2s;
         }
 
-        button:hover { 
-            background: var(--tech-cyan); 
-            color: var(--bg-dark);
-            box-shadow: 0 0 15px var(--tech-cyan);
-        }
+        button:hover { background: #002266; }
 
-        .gps-btn { 
-            background: var(--pc-yellow); 
-            color: var(--pc-blue); 
-            border: none;
-        }
+        .gps-btn { background: #ffcc00; color: #003399; }
+        .gps-btn:hover { background: #e6b800; }
 
-        /* Mappa */
+        /* Mappa con altezza definita */
         #map { 
-            height: calc(100vh - 180px); 
-            width: 95%; 
-            margin: 20px auto;
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.1);
-            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+            height: calc(100vh - 140px); 
+            width: 100%; 
+            background: #f0f0f0;
         }
 
-        /* Personalizzazione Popup Leaflet */
-        .leaflet-popup-content-wrapper {
-            background: var(--panel-bg);
-            color: white;
-            border: 1px solid var(--tech-cyan);
-        }
-        .leaflet-popup-tip { background: var(--tech-cyan); }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        /* Layout Responsive */
-        @media (max-width: 768px) {
-            .controls { flex-direction: column; }
-            input, button { width: 100%; }
-        }
+        /* Stile per i popup */
+        .leaflet-popup-content { font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="pc-header">
-        <h1>PRO-CIV TOSCOLANO MADERNO <span style="color:white; font-size: 0.7em;">// TLC UNIT</span></h1>
-        <div class="status-badge">SISTEMA ATTIVO</div>
+        <h1>PRO-CIV TOSCOLANO MADERNO <span style="opacity: 0.8;">| TLC</span></h1>
+        <div class="status" id="statusLabel">SISTEMA PRONTO</div>
     </div>
 
     <div class="controls">
-        <input type="text" id="poiName" placeholder="ID UNITA' (es. Radio 1)">
-        <input type="text" id="lat" placeholder="LATITUDINE">
-        <input type="text" id="lng" placeholder="LONGITUDINE">
+        <input type="text" id="poiName" placeholder="Identificativo Radio">
+        <input type="text" id="lat" placeholder="Latitudine">
+        <input type="text" id="lng" placeholder="Longitudine">
         <button class="gps-btn" onclick="rilevaPosizione()">📍 RILEVA GPS</button>
-        <button onclick="aggiungiPunto()">📡 INVIA POSIZIONE</button>
+        <button onclick="aggiungiPunto()">AGGIUNGI PUNTO</button>
     </div>
 
     <div id="map"></div>
 
-    <!-- Leaflet JS -->
+    <!-- FONDAMENTALE: JS di Leaflet -->
     <script src="unpkg.com"></script>
 
     <script>
-        // Inizializzazione mappa con controlli zoom presenti
+        // Inizializzazione della mappa
+        // zoomControl: true garantisce la presenza dei tasti + e -
         var map = L.map('map', {
             center: [45.6415, 10.6083], 
             zoom: 13,
-            zoomControl: true
+            zoomControl: true 
         });
 
-        // Layer Dark (Stile Tecnologico)
-        var dark = L.tileLayer('https://{s}{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
+        // Layer Stradale standard (Chiaro e leggibile)
+        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
         }).addTo(map);
 
         // Layer Satellite
         var satellite = L.tileLayer('mt1.google.com{x}&y={y}&z={z}', {
-            attribution: '&copy; Google Maps'
+            attribution: '© Google Maps'
         });
 
-        // Controllo Layer
+        // Menu per cambiare tipo di mappa
         var baseMaps = {
-            "<span style='color: #1a1a2e'>Visione Notturna</span>": dark,
-            "<span style='color: #1a1a2e'>Satellite</span>": satellite
+            "Mappa Stradale": stradale,
+            "Satellite": satellite
         };
         L.control.layers(baseMaps).addTo(map);
 
-        // Funzione GPS
+        // Funzione per la posizione GPS
         function rilevaPosizione() {
             if (!navigator.geolocation) { alert("GPS non supportato."); return; }
             
-            // Effetto visivo durante il caricamento
-            document.querySelector('.status-badge').innerText = "RICERCA SEGNALE...";
-            
+            document.getElementById('statusLabel').innerText = "RICERCA...";
+            document.getElementById('statusLabel').style.background = "#fd7e14";
+
             navigator.geolocation.getCurrentPosition(function(p) {
-                document.getElementById('lat').value = p.coords.latitude.toFixed(6);
-                document.getElementById('lng').value = p.coords.longitude.toFixed(6);
-                map.setView([p.coords.latitude, p.coords.longitude], 16);
-                document.querySelector('.status-badge').innerText = "POSIZIONE AGGIORNATA";
-                setTimeout(() => { document.querySelector('.status-badge').innerText = "SISTEMA ATTIVO"; }, 3000);
+                const lt = p.coords.latitude.toFixed(6);
+                const lg = p.coords.longitude.toFixed(6);
+                document.getElementById('lat').value = lt;
+                document.getElementById('lng').value = lg;
+                
+                map.setView([lt, lg], 16);
+                document.getElementById('statusLabel').innerText = "POSIZIONE ACQUISITA";
+                document.getElementById('statusLabel').style.background = "#28a745";
             }, function(e) { 
                 alert("Errore GPS: " + e.message); 
-                document.querySelector('.status-badge').innerText = "ERRORE GPS";
+                document.getElementById('statusLabel').innerText = "ERRORE GPS";
+                document.getElementById('statusLabel').style.background = "#dc3545";
             });
         }
 
-        // Aggiunta Marker con stile
+        // Funzione per aggiungere un marker
         function aggiungiPunto() {
             var lat = parseFloat(document.getElementById('lat').value);
             var lng = parseFloat(document.getElementById('lng').value);
-            var idRadio = document.getElementById('poiName').value || "UNITA' TLC";
+            var nome = document.getElementById('poiName').value || "Punto Generico";
 
             if (!isNaN(lat) && !isNaN(lng)) {
-                var marker = L.marker([lat, lng]).addTo(map);
-                marker.bindPopup(`
-                    <div style="text-align:center">
-                        <strong style="color:#00f2ff">${idRadio}</strong><br>
-                        <small>Coordinate: ${lat}, ${lng}</small><br>
-                        <button style="margin-top:10px; padding:5px; font-size:10px;" onclick="window.open('www.google.com{lat},${lng}')">Naviga</button>
-                    </div>
-                `).openPopup();
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup(nome)
+                    .openPopup();
                 map.setView([lat, lng], 15);
             } else {
-                alert("Inserire coordinate valide o usare il tasto GPS.");
+                alert("Inserisci coordinate valide.");
             }
         }
 
-        // Fix per caricamento corretto
-        window.addEventListener('load', function() {
-            setTimeout(function() { map.invalidateSize(); }, 500);
-        });
+        // Forza il ricalcolo delle dimensioni della mappa dopo il caricamento
+        window.dispatchEvent(new Event('resize'));
+        setTimeout(function() { map.invalidateSize(); }, 500);
     </script>
 </body>
 </html>
