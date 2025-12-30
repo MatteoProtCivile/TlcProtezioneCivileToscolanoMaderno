@@ -1,74 +1,98 @@
-<script>
-    // 1. Mappa Stradale (OpenStreetMap)
-    var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="www.openstreetmap.org">OpenStreetMap</a> contributors'
-    });
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mappa Interattiva Leaflet 2025</title>
 
-    // 2. Mappa Satellitare (Google Maps - CORRETTO)
-    // Nota: l'URL corretto utilizza lyrs=s per il satellite
-    var satellite = L.tileLayer('https://{s}{x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: '&copy; Google Maps'
-    });
-
-    // Inizializzazione Mappa
-    var map = L.map('map', {
-        center: [41.8719, 12.5674], // Centro Italia
-        zoom: 6,
-        layers: [stradale] 
-    });
-
-    // Gestione Layer (Switch tra stradale e satellite)
-    var baseMaps = {
-        "Mappa Stradale": stradale,
-        "Satellite": satellite
-    };
-
-    L.control.layers(baseMaps).addTo(map);
-
-    // Archivio Marker
-    var markers = {};
-
-    // Funzione per rilevare la posizione GPS
-    function rilevaPosizione() {
-        if (!navigator.geolocation) { 
-            alert("Il tuo browser non supporta la geolocalizzazione."); 
-            return; 
+    <!-- 1. CSS di Leaflet (Indispensabile per non vedere la pagina bianca) -->
+    <link rel="stylesheet" href="unpkg.com" />
+    
+    <style>
+        /* 2. Definizione altezza mappa (Indispensabile) */
+        #map { 
+            height: 600px; 
+            width: 100%; 
+            border: 2px solid #ccc;
+            border-radius: 8px;
         }
-        
-        navigator.geolocation.getCurrentPosition(function(p) {
-            document.getElementById('lat').value = p.coords.latitude.toFixed(6);
-            document.getElementById('lng').value = p.coords.longitude.toFixed(6);
-            
-            // Opzionale: sposta subito la mappa sulla posizione rilevata
-            map.setView([p.coords.latitude, p.coords.longitude], 15);
-        }, function(e) { 
-            alert("Errore GPS: " + e.message); 
-        }, {
-            enableHighAccuracy: true // Tenta di ottenere la massima precisione
+        .controls {
+            margin-bottom: 15px;
+            font-family: sans-serif;
+        }
+        input { margin-right: 10px; padding: 5px; }
+        button { padding: 5px 15px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <input type="text" id="poiName" placeholder="Nome Punto">
+        <input type="text" id="lat" placeholder="Latitudine">
+        <input type="text" id="lng" placeholder="Longitudine">
+        <button onclick="rilevaPosizione()">📍 Rileva GPS</button>
+        <button onclick="aggiungiPunto()">➕ Aggiungi Punto</button>
+    </div>
+
+    <!-- 3. Contenitore della mappa -->
+    <div id="map"></div>
+
+    <!-- 4. Script di Leaflet -->
+    <script src="unpkg.com"></script>
+
+    <script>
+        // Mappa Stradale (OpenStreetMap)
+        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="www.openstreetmap.org">OpenStreetMap</a>'
         });
-    }
 
-    // Funzione per aggiungere un punto sulla mappa
-    function aggiungiPunto() {
-        var lat = parseFloat(document.getElementById('lat').value);
-        var lng = parseFloat(document.getElementById('lng').value);
-        var nome = document.getElementById('poiName').value || "Punto di Interesse";
+        // Mappa Satellitare (Google Maps - URL Corretto)
+        var satellite = L.tileLayer('https://{s}{x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
+        });
 
-        if (!isNaN(lat) && !isNaN(lng)) {
-            // Se esiste già un marker con lo stesso nome, lo rimuoviamo
-            if (markers[nome]) {
-                map.removeLayer(markers[nome]);
-            }
-            
-            // Creazione nuovo marker
-            markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup(nome).openPopup();
-            
-            // Centra la mappa sul nuovo punto
-            map.setView([lat, lng], 15);
-        } else {
-            alert("Per favore, inserisci coordinate valide.");
+        // Inizializzazione mappa
+        var map = L.map('map', {
+            center: [41.8719, 12.5674], // Roma
+            zoom: 6,
+            layers: [stradale] 
+        });
+
+        // Controllo Layer
+        var baseMaps = {
+            "Mappa Stradale": stradale,
+            "Satellite": satellite
+        };
+        L.control.layers(baseMaps).addTo(map);
+
+        var markers = {};
+
+        // Funzione GPS
+        function rilevaPosizione() {
+            if (!navigator.geolocation) { alert("GPS non supportato."); return; }
+            navigator.geolocation.getCurrentPosition(function(p) {
+                document.getElementById('lat').value = p.coords.latitude.toFixed(6);
+                document.getElementById('lng').value = p.coords.longitude.toFixed(6);
+                map.setView([p.coords.latitude, p.coords.longitude], 15);
+            }, function(e) { alert("Errore GPS: " + e.message); });
         }
-    }
-</script>
+
+        // Funzione per aggiungere Marker
+        function aggiungiPunto() {
+            var lat = parseFloat(document.getElementById('lat').value);
+            var lng = parseFloat(document.getElementById('lng').value);
+            var nome = document.getElementById('poiName').value || "Punto";
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                if (markers[nome]) map.removeLayer(markers[nome]);
+                markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup(nome).openPopup();
+                map.setView([lat, lng], 15);
+            } else {
+                alert("Inserisci coordinate valide.");
+            }
+        }
+    </script>
+</body>
+</html>
