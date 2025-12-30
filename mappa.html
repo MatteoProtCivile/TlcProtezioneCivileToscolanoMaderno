@@ -3,64 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mappa Interattiva Leaflet 2025</title>
+    <title>Mappa Completa Leaflet 2025</title>
 
-    <!-- 1. CSS di Leaflet (Indispensabile per non vedere la pagina bianca) -->
+    <!-- 1. CARICAMENTO CSS DI LEAFLET -->
     <link rel="stylesheet" href="unpkg.com" />
     
     <style>
-        /* 2. Definizione altezza mappa (Indispensabile) */
+        /* 2. STILE DELLA PAGINA */
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        
         #map { 
             height: 600px; 
             width: 100%; 
-            border: 2px solid #ccc;
-            border-radius: 8px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background: #ddd; /* Colore di sfondo se la mappa non carica */
         }
+        
         .controls {
-            margin-bottom: 15px;
-            font-family: sans-serif;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
         }
-        input { margin-right: 10px; padding: 5px; }
-        button { padding: 5px 15px; cursor: pointer; }
+
+        input { padding: 8px; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { 
+            padding: 8px 15px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        button:hover { background-color: #0056b3; }
+        .gps-btn { background-color: #28a745; }
+        .gps-btn:hover { background-color: #218838; }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <input type="text" id="poiName" placeholder="Nome Punto">
+        <strong>Gestione Punti:</strong><br><br>
+        <input type="text" id="poiName" placeholder="Nome Luogo">
         <input type="text" id="lat" placeholder="Latitudine">
         <input type="text" id="lng" placeholder="Longitudine">
-        <button onclick="rilevaPosizione()">📍 Rileva GPS</button>
-        <button onclick="aggiungiPunto()">➕ Aggiungi Punto</button>
+        <button class="gps-btn" onclick="rilevaPosizione()">📍 Rileva GPS</button>
+        <button onclick="aggiungiPunto()">➕ Aggiungi alla Mappa</button>
     </div>
 
-    <!-- 3. Contenitore della mappa -->
+    <!-- CONTENITORE MAPPA -->
     <div id="map"></div>
 
-    <!-- 4. Script di Leaflet -->
+    <!-- 3. CARICAMENTO JAVASCRIPT DI LEAFLET -->
     <script src="unpkg.com"></script>
 
     <script>
-        // Mappa Stradale (OpenStreetMap)
+        // --- CONFIGURAZIONE MAPPA ---
+        
+        // Layer Stradale OpenStreetMap
         var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="www.openstreetmap.org">OpenStreetMap</a>'
+            attribution: '&copy; OpenStreetMap contributors'
         });
 
-        // Mappa Satellitare (Google Maps - URL Corretto)
-        var satellite = L.tileLayer('https://{s}{x}&y={y}&z={z}', {
-            maxZoom: 20,
-            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        // Layer Satellite Google (URL 2025 ottimizzato)
+        var satellite = L.tileLayer('mt1.google.com{x}&y={y}&z={z}', {
             attribution: '&copy; Google Maps'
         });
 
-        // Inizializzazione mappa
+        // Inizializzazione della mappa su Roma
         var map = L.map('map', {
-            center: [41.8719, 12.5674], // Roma
+            center: [41.8719, 12.5674],
             zoom: 6,
             layers: [stradale] 
         });
 
-        // Controllo Layer
+        // Menu per cambiare tipo di mappa
         var baseMaps = {
             "Mappa Stradale": stradale,
             "Satellite": satellite
@@ -69,28 +88,50 @@
 
         var markers = {};
 
-        // Funzione GPS
+        // --- FUNZIONI ---
+
+        // Fix per caricamento corretto della grafica
+        window.onload = function() {
+            setTimeout(function() { 
+                map.invalidateSize(); 
+            }, 500);
+        };
+
+        // Rileva posizione GPS dell'utente
         function rilevaPosizione() {
-            if (!navigator.geolocation) { alert("GPS non supportato."); return; }
+            if (!navigator.geolocation) {
+                alert("Il tuo browser non supporta il GPS.");
+                return;
+            }
             navigator.geolocation.getCurrentPosition(function(p) {
-                document.getElementById('lat').value = p.coords.latitude.toFixed(6);
-                document.getElementById('lng').value = p.coords.longitude.toFixed(6);
-                map.setView([p.coords.latitude, p.coords.longitude], 15);
-            }, function(e) { alert("Errore GPS: " + e.message); });
+                var lat = p.coords.latitude.toFixed(6);
+                var lng = p.coords.longitude.toFixed(6);
+                document.getElementById('lat').value = lat;
+                document.getElementById('lng').value = lng;
+                map.setView([lat, lng], 15);
+            }, function(e) {
+                alert("Errore GPS: " + e.message + ". Assicurati di usare HTTPS o localhost.");
+            });
         }
 
-        // Funzione per aggiungere Marker
+        // Aggiunge un marker basato sugli input
         function aggiungiPunto() {
             var lat = parseFloat(document.getElementById('lat').value);
             var lng = parseFloat(document.getElementById('lng').value);
-            var nome = document.getElementById('poiName').value || "Punto";
+            var nome = document.getElementById('poiName').value || "Punto Selezionato";
 
             if (!isNaN(lat) && !isNaN(lng)) {
+                // Rimuove marker precedente con lo stesso nome se esiste
                 if (markers[nome]) map.removeLayer(markers[nome]);
-                markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup(nome).openPopup();
+                
+                // Crea nuovo marker
+                markers[nome] = L.marker([lat, lng]).addTo(map)
+                    .bindPopup("<b>" + nome + "</b><br>Lat: " + lat + "<br>Lng: " + lng)
+                    .openPopup();
+                
                 map.setView([lat, lng], 15);
             } else {
-                alert("Inserisci coordinate valide.");
+                alert("Per favore inserisci coordinate valide nei campi Latitudine e Longitudine.");
             }
         }
     </script>
