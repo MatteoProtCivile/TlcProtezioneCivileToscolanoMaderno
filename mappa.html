@@ -3,135 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mappa Completa Leaflet 2025</title>
+    <title>Protezione Civile - TLC Toscolano Maderno</title>
 
-    <!-- 1. CARICAMENTO CSS DI LEAFLET -->
+    <!-- CSS di Leaflet caricato da CDN affidabile -->
     <link rel="stylesheet" href="unpkg.com" />
     
     <style>
-        /* 2. STILE DELLA PAGINA */
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; }
         
+        /* Testata Protezione Civile */
+        .pc-header {
+            background-color: #003399; 
+            color: #ffcc00; 
+            padding: 15px;
+            border-bottom: 5px solid #ffcc00;
+            display: flex;
+            align-items: center;
+        }
+
+        .pc-header h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
+
+        .controls {
+            padding: 15px;
+            background: white;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Altezza fissa della mappa per evitare il rettangolo grigio vuoto */
         #map { 
             height: 600px; 
             width: 100%; 
-            border: 2px solid #333;
-            border-radius: 10px;
-            background: #ddd; /* Colore di sfondo se la mappa non carica */
-        }
-        
-        .controls {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
+            background: #cbdbe5; /* Colore di caricamento */
         }
 
-        input { padding: 8px; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        button { 
-            padding: 8px 15px; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-        }
-        button:hover { background-color: #0056b3; }
-        .gps-btn { background-color: #28a745; }
-        .gps-btn:hover { background-color: #218838; }
+        input { padding: 8px; border: 1px solid #ccc; }
+        button { padding: 8px 15px; background: #003399; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .gps-btn { background: #ffcc00; color: #003399; }
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <strong>Gestione Punti:</strong><br><br>
-        <input type="text" id="poiName" placeholder="Nome Luogo">
-        <input type="text" id="lat" placeholder="Latitudine">
-        <input type="text" id="lng" placeholder="Longitudine">
-        <button class="gps-btn" onclick="rilevaPosizione()">📍 Rileva GPS</button>
-        <button onclick="aggiungiPunto()">➕ Aggiungi alla Mappa</button>
+    <div class="pc-header">
+        <h1>PROTEZIONE CIVILE - TOSCOLANO MADERNO <span style="color:white; font-size: 0.7em;">| REPARTO TLC</span></h1>
     </div>
 
-    <!-- CONTENITORE MAPPA -->
+    <div class="controls">
+        <input type="text" id="poiName" placeholder="ID Radio">
+        <input type="text" id="lat" placeholder="Latitudine">
+        <input type="text" id="lng" placeholder="Longitudine">
+        <button class="gps-btn" onclick="rilevaPosizione()">📍 GPS</button>
+        <button onclick="aggiungiPunto()">Aggiungi</button>
+    </div>
+
     <div id="map"></div>
 
-    <!-- 3. CARICAMENTO JAVASCRIPT DI LEAFLET -->
+    <!-- JS di Leaflet -->
     <script src="unpkg.com"></script>
 
     <script>
-        // --- CONFIGURAZIONE MAPPA ---
-        
-        // Layer Stradale OpenStreetMap
-        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+        // Inizializzazione mappa
+        var map = L.map('map', {
+            center: [45.6415, 10.6083], 
+            zoom: 13
         });
 
-        // Layer Satellite Google (URL 2025 ottimizzato)
+        // Layer Stradale - Utilizziamo un server alternativo (HOT) spesso più veloce
+        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Layer Satellite - Google Maps
         var satellite = L.tileLayer('mt1.google.com{x}&y={y}&z={z}', {
             attribution: '&copy; Google Maps'
         });
 
-        // Inizializzazione della mappa su Roma
-        var map = L.map('map', {
-            center: [41.8719, 12.5674],
-            zoom: 6,
-            layers: [stradale] 
+        L.control.layers({"Mappa Stradale": stradale, "Satellite": satellite}).addTo(map);
+
+        // --- SOLUZIONE AL PROBLEMA "MAPPA GRIGIA" ---
+        // Questo comando forza il browser a ridisegnare la mappa ogni volta che la pagina finisce di caricare
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                map.invalidateSize();
+            }, 1000); // Aspetta 1 secondo e poi forza il caricamento
         });
 
-        // Menu per cambiare tipo di mappa
-        var baseMaps = {
-            "Mappa Stradale": stradale,
-            "Satellite": satellite
-        };
-        L.control.layers(baseMaps).addTo(map);
-
-        var markers = {};
-
-        // --- FUNZIONI ---
-
-        // Fix per caricamento corretto della grafica
-        window.onload = function() {
-            setTimeout(function() { 
-                map.invalidateSize(); 
-            }, 500);
-        };
-
-        // Rileva posizione GPS dell'utente
         function rilevaPosizione() {
-            if (!navigator.geolocation) {
-                alert("Il tuo browser non supporta il GPS.");
-                return;
-            }
+            if (!navigator.geolocation) { alert("GPS non supportato."); return; }
             navigator.geolocation.getCurrentPosition(function(p) {
-                var lat = p.coords.latitude.toFixed(6);
-                var lng = p.coords.longitude.toFixed(6);
-                document.getElementById('lat').value = lat;
-                document.getElementById('lng').value = lng;
-                map.setView([lat, lng], 15);
-            }, function(e) {
-                alert("Errore GPS: " + e.message + ". Assicurati di usare HTTPS o localhost.");
-            });
+                document.getElementById('lat').value = p.coords.latitude.toFixed(6);
+                document.getElementById('lng').value = p.coords.longitude.toFixed(6);
+                map.setView([p.coords.latitude, p.coords.longitude], 15);
+            }, function(e) { alert("Errore GPS: " + e.message); });
         }
 
-        // Aggiunge un marker basato sugli input
         function aggiungiPunto() {
             var lat = parseFloat(document.getElementById('lat').value);
             var lng = parseFloat(document.getElementById('lng').value);
-            var nome = document.getElementById('poiName').value || "Punto Selezionato";
-
             if (!isNaN(lat) && !isNaN(lng)) {
-                // Rimuove marker precedente con lo stesso nome se esiste
-                if (markers[nome]) map.removeLayer(markers[nome]);
-                
-                // Crea nuovo marker
-                markers[nome] = L.marker([lat, lng]).addTo(map)
-                    .bindPopup("<b>" + nome + "</b><br>Lat: " + lat + "<br>Lng: " + lng)
-                    .openPopup();
-                
+                L.marker([lat, lng]).addTo(map).bindPopup(document.getElementById('poiName').value || "Punto").openPopup();
                 map.setView([lat, lng], 15);
-            } else {
-                alert("Per favore inserisci coordinate valide nei campi Latitudine e Longitudine.");
             }
         }
     </script>
