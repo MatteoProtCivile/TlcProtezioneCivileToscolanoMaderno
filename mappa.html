@@ -3,113 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TLC - Protezione Civile Toscolano Maderno</title>
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="unpkg.com" crossorigin="anonymous" />
+    <title>Protezione Civile TLC - Toscolano Maderno</title>
+    
+    <!-- CSS di Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        html, body { height: 100%; margin: 0; display: flex; flex-direction: column; font-family: sans-serif; }
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; }
         
+        /* Header superiore */
         .pc-header {
-            background-color: #003399; color: white; padding: 15px;
-            border-bottom: 4px solid #ffcc00; text-align: center; flex-shrink: 0;
+            background-color: #003399; 
+            color: #ffffff; 
+            padding: 15px; 
+            text-align: center; 
+            border-bottom: 5px solid #ffcc00;
         }
 
-        .controls {
-            background: white; padding: 10px; display: flex; gap: 8px;
-            flex-wrap: wrap; justify-content: center; border-bottom: 1px solid #ccc; flex-shrink: 0;
+        .controls { 
+            background: #ffffff; 
+            padding: 15px; 
+            text-align: center;
+            border-bottom: 1px solid #ccc;
         }
 
-        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 140px; }
-        button { padding: 8px 15px; cursor: pointer; border-radius: 4px; border: none; font-weight: bold; }
-        .btn-gps { background-color: #ffcc00; color: #003399; }
-        .btn-add { background-color: #003399; color: white; }
+        input { margin: 5px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 150px; }
+        
+        button { 
+            padding: 8px 15px; 
+            cursor: pointer; 
+            background: #003399; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            font-weight: bold;
+        }
 
-        /* Mappa */
-        #map { flex-grow: 1; width: 100%; background: #e0e0e0; }
+        .btn-gps { background: #ffcc00; color: #003399; margin-right: 10px; }
 
+        /* Mappa con altezza fissa per garantire la visibilità */
+        #map { height: 600px; width: 100%; border-bottom: 1px solid #ccc; }
+
+        /* Footer inferiore */
         .pc-footer {
-            background-color: #003399; color: white; padding: 10px;
-            border-top: 2px solid #ffcc00; text-align: center; font-size: 0.8rem; flex-shrink: 0;
+            background-color: #003399;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.8em;
+            border-top: 3px solid #ffcc00;
         }
     </style>
 </head>
 <body>
 
-    <header class="pc-header">
-        <strong>PROTEZIONE CIVILE TOSCOLANO MADERNO - REPARTO TLC</strong>
-    </header>
+    <div class="pc-header">
+        <h2 style="margin:0;">PROTEZIONE CIVILE TOSCOLANO MADERNO LOCALIZZAZIONE APPARATI & ATTREZZATURA</h2>
+        <span style="font-size: 0.9em;">REPARTO TLC</span>
+    </div>
 
     <div class="controls">
-        <input type="text" id="nomePunto" placeholder="ID Radio">
-        <input type="number" id="lat" placeholder="Latitudine" step="any">
-        <input type="number" id="lng" placeholder="Longitudine" step="any">
-        <button class="btn-gps" onclick="rilevaPosizione()">📍 GPS</button>
-        <button class="btn-add" onclick="aggiungiPunto()">AGGIUNGI</button>
+        <input type="text" id="poiName" placeholder="ID Radio / Unità">
+        <input type="text" id="lat" placeholder="Latitudine">
+        <input type="text" id="lng" placeholder="Longitudine">
+        <br>
+        <button class="btn-gps" onclick="rilevaPosizione()">📍 RILEVA MIA POSIZIONE</button>
+        <button onclick="aggiungiPunto()">AGGIUNGI SULLA MAPPA</button>
     </div>
 
     <div id="map"></div>
 
-    <footer class="pc-footer">
+    <div class="pc-footer">
         Versione 2025 | Creatore: Matteo Podavini &reg;
-    </footer>
+    </div>
 
-    <!-- Leaflet JS -->
-    <script src="unpkg.com" crossorigin="anonymous"></script>
-
+    <!-- Script Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <script>
-        // 1. Definizione dei due tipi di mappa
-        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        });
+        // Inizializza la mappa centrata su Toscolano Maderno
+        var map = L.map('map').setView([45.6415, 10.6083], 13);
 
-        var satellite = L.tileLayer('mt1.google.com{x}&y={y}&z={z}', {
-            attribution: '&copy; Google Maps'
-        });
+        // Aggiunge lo strato stradale di OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-        // 2. Inizializzazione mappa (parte con stradale)
-        var map = L.map('map', {
-            center: [45.6415, 10.6083],
-            zoom: 13,
-            layers: [stradale], // Default
-            zoomControl: true
-        });
-
-        // 3. Aggiunta selettore in alto a destra per cambiare mappa
-        var baseMaps = {
-            "Mappa Stradale": stradale,
-            "Satellite": satellite
-        };
-        L.control.layers(baseMaps).addTo(map);
-
-        // Funzione per correggere il problema del grigio al caricamento
-        function fixMap() {
-            map.invalidateSize();
-        }
-        window.onload = function() { setTimeout(fixMap, 500); };
-
+        // Funzione per rilevare la posizione GPS
         function rilevaPosizione() {
-            if (!navigator.geolocation) { alert("GPS non supportato"); return; }
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                var lt = pos.coords.latitude.toFixed(6);
-                var lg = pos.coords.longitude.toFixed(6);
-                document.getElementById('lat').value = lt;
-                document.getElementById('lng').value = lg;
-                map.setView([lt, lg], 16);
-                L.marker([lt, lg]).addTo(map).bindPopup("Unità TLC").openPopup();
-            }, function() { alert("Attiva il GPS."); });
+            if (!navigator.geolocation) {
+                alert("Il GPS non è supportato dal tuo browser.");
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude.toFixed(6);
+                var lng = position.coords.longitude.toFixed(6);
+                
+                document.getElementById('lat').value = lat;
+                document.getElementById('lng').value = lng;
+                
+                L.marker([lat, lng]).addTo(map).bindPopup("Tua Posizione Attuale").openPopup();
+                map.setView([lat, lng], 15);
+            }, function(error) {
+                alert("Errore GPS: " + error.message);
+            });
         }
 
+        // Funzione per aggiungere un punto personalizzato
         function aggiungiPunto() {
-            var n = document.getElementById('nomePunto').value || "Unità";
-            var la = parseFloat(document.getElementById('lat').value);
-            var lo = parseFloat(document.getElementById('lng').value);
-            if (!isNaN(la) && !isNaN(lo)) {
-                L.marker([la, lo]).addTo(map).bindPopup(n).openPopup();
-                map.flyTo([la, lo], 15);
+            var lat = document.getElementById('lat').value;
+            var lng = document.getElementById('lng').value;
+            var nome = document.getElementById('poiName').value || "Unità TLC";
+
+            if (lat && lng) {
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup("<b>" + nome + "</b><br>Lat: " + lat + "<br>Lng: " + lng)
+                    .openPopup();
+                
+                map.setView([lat, lng], 15);
+            } else {
+                alert("Inserisci coordinate o usa il tasto GPS.");
             }
         }
+
+        // Fix per caricamento su alcuni browser
+        setTimeout(function(){ map.invalidateSize()}, 500);
     </script>
 </body>
 </html>
