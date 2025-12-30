@@ -5,62 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TLC - Protezione Civile Toscolano Maderno</title>
 
-    <!-- FONDAMENTALE: CSS di Leaflet con integrità verificata -->
-    <link rel="stylesheet" href="unpkg.com" crossorigin="" />
+    <!-- CSS di Leaflet (Protocollo HTTPS esplicito) -->
+    <link rel="stylesheet" href="unpkg.com" crossorigin="anonymous" />
     
     <style>
-        /* Struttura Pagina */
+        /* Struttura bloccata per evitare errori di rendering su GitHub */
         html, body { 
             height: 100%; 
             margin: 0; 
+            padding: 0;
             display: flex; 
             flex-direction: column; 
-            font-family: sans-serif;
-            background-color: #ffffff;
+            font-family: Arial, sans-serif;
         }
 
-        /* Header */
         .pc-header {
             background-color: #003399; 
-            color: white; 
+            color: #ffffff; 
             padding: 15px;
             border-bottom: 4px solid #ffcc00;
             text-align: center;
+            flex-shrink: 0;
         }
 
-        /* Area Controlli */
         .controls {
-            background: #f8f9fa;
+            background: #ffffff;
             padding: 10px;
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #ccc;
+            flex-shrink: 0;
         }
 
         input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        
-        button { 
-            padding: 8px 15px; 
-            cursor: pointer; 
-            border-radius: 4px; 
-            border: none; 
-            font-weight: bold; 
-        }
-
+        button { padding: 8px 15px; cursor: pointer; border-radius: 4px; border: none; font-weight: bold; color: white; }
         .btn-gps { background-color: #ffcc00; color: #003399; }
-        .btn-add { background-color: #003399; color: white; }
+        .btn-add { background-color: #003399; }
 
-        /* Mappa: Forzata la visibilità con altezza minima */
+        /* Altezza forzata della mappa */
         #map { 
-            flex-grow: 1; 
+            flex: 1 1 auto; /* Occupa tutto lo spazio disponibile */
             width: 100%; 
-            min-height: 400px;
-            background: #e0e0e0; /* Colore di backup se la mappa non carica */
+            min-height: 500px; /* Altezza minima garantita */
+            background-color: #e5e3df; 
         }
 
-        /* Footer */
         .pc-footer {
             background-color: #003399; 
             color: white; 
@@ -68,12 +59,11 @@
             border-top: 2px solid #ffcc00;
             text-align: center;
             font-size: 0.8rem;
+            flex-shrink: 0;
         }
 
-        /* Stile forzato per pulsanti zoom se spariscono */
-        .leaflet-control-zoom {
-            border: 2px solid #003399 !important;
-        }
+        /* Forza la visibilità delle icone Leaflet */
+        .leaflet-container { height: 100%; width: 100%; }
     </style>
 </head>
 <body>
@@ -96,31 +86,30 @@
         Versione 2025 | Creatore: Matteo Podavini &reg;
     </footer>
 
-    <!-- JS di Leaflet -->
-    <script src="unpkg.com" crossorigin=""></script>
+    <!-- JS di Leaflet (HTTPS esplicito) -->
+    <script src="unpkg.com" crossorigin="anonymous"></script>
 
     <script>
-        // Inizializzazione mappa
+        // Inizializzazione sicura
         var map = L.map('map', {
-            zoomControl: true // Attiva i tasti + e -
+            zoomControl: true 
         }).setView([45.6415, 10.6083], 13);
 
-        // Caricamento layer stradale
-        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // Uso di TileLayer HTTPS (Standard OSM)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // FUNZIONE PER RISOLVERE IL PROBLEMA DELLA MAPPA INVISIBILE
+        // Fix per GitHub Pages: forza il ridisegno dopo il caricamento
         function fixMap() {
-            setTimeout(function() {
-                map.invalidateSize();
-                console.log("Mappa ricalcolata correttamente.");
-            }, 500);
+            window.dispatchEvent(new Event('resize'));
+            map.invalidateSize();
         }
 
-        // Avvia il fix al caricamento
-        window.onload = fixMap;
+        window.onload = function() {
+            setTimeout(fixMap, 500);
+        };
 
         function rilevaPosizione() {
             if (!navigator.geolocation) { alert("GPS non supportato"); return; }
@@ -130,17 +119,17 @@
                 document.getElementById('lat').value = lt;
                 document.getElementById('lng').value = lg;
                 map.setView([lt, lg], 16);
-                L.marker([lt, lg]).addTo(map).bindPopup("Sei qui").openPopup();
-            }, function(err) { alert("Errore GPS"); });
+                L.marker([lt, lg]).addTo(map).bindPopup("Posizione Unità").openPopup();
+            }, function(err) { alert("Attivare il GPS sul dispositivo"); });
         }
 
         function aggiungiPunto() {
-            var n = document.getElementById('nomePunto').value || "Unità TLC";
+            var n = document.getElementById('nomePunto').value || "Punto TLC";
             var la = parseFloat(document.getElementById('lat').value);
             var lo = parseFloat(document.getElementById('lng').value);
             if (!isNaN(la) && !isNaN(lo)) {
                 L.marker([la, lo]).addTo(map).bindPopup(n).openPopup();
-                map.panTo([la, lo]);
+                map.flyTo([la, lo], 15);
             } else {
                 alert("Inserire coordinate.");
             }
