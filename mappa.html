@@ -1,22 +1,25 @@
 <script>
-    // Mappa Stradale
+    // 1. Mappa Stradale (OpenStreetMap)
     var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
+        attribution: '&copy; <a href="www.openstreetmap.org">OpenStreetMap</a> contributors'
     });
 
-    // Mappa Satellitare (Google - Solitamente più stabile)
+    // 2. Mappa Satellitare (Google Maps - CORRETTO)
+    // Nota: l'URL corretto utilizza lyrs=s per il satellite
     var satellite = L.tileLayer('https://{s}{x}&y={y}&z={z}', {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: '&copy; Google Maps Satellite'
+        attribution: '&copy; Google Maps'
     });
 
+    // Inizializzazione Mappa
     var map = L.map('map', {
-        center: [41.8719, 12.5674],
+        center: [41.8719, 12.5674], // Centro Italia
         zoom: 6,
         layers: [stradale] 
     });
 
+    // Gestione Layer (Switch tra stradale e satellite)
     var baseMaps = {
         "Mappa Stradale": stradale,
         "Satellite": satellite
@@ -24,24 +27,48 @@
 
     L.control.layers(baseMaps).addTo(map);
 
+    // Archivio Marker
     var markers = {};
 
+    // Funzione per rilevare la posizione GPS
     function rilevaPosizione() {
-        if (!navigator.geolocation) { alert("GPS non supportato."); return; }
+        if (!navigator.geolocation) { 
+            alert("Il tuo browser non supporta la geolocalizzazione."); 
+            return; 
+        }
+        
         navigator.geolocation.getCurrentPosition(function(p) {
             document.getElementById('lat').value = p.coords.latitude.toFixed(6);
             document.getElementById('lng').value = p.coords.longitude.toFixed(6);
-        }, function(e) { alert("Errore GPS: " + e.message); });
+            
+            // Opzionale: sposta subito la mappa sulla posizione rilevata
+            map.setView([p.coords.latitude, p.coords.longitude], 15);
+        }, function(e) { 
+            alert("Errore GPS: " + e.message); 
+        }, {
+            enableHighAccuracy: true // Tenta di ottenere la massima precisione
+        });
     }
 
+    // Funzione per aggiungere un punto sulla mappa
     function aggiungiPunto() {
-        var lat = document.getElementById('lat').value;
-        var lng = document.getElementById('lng').value;
-        var nome = document.getElementById('poiName').value || "POI";
-        if (lat && lng) {
-            if (markers[nome]) map.removeLayer(markers[nome]);
+        var lat = parseFloat(document.getElementById('lat').value);
+        var lng = parseFloat(document.getElementById('lng').value);
+        var nome = document.getElementById('poiName').value || "Punto di Interesse";
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+            // Se esiste già un marker con lo stesso nome, lo rimuoviamo
+            if (markers[nome]) {
+                map.removeLayer(markers[nome]);
+            }
+            
+            // Creazione nuovo marker
             markers[nome] = L.marker([lat, lng]).addTo(map).bindPopup(nome).openPopup();
+            
+            // Centra la mappa sul nuovo punto
             map.setView([lat, lng], 15);
+        } else {
+            alert("Per favore, inserisci coordinate valide.");
         }
     }
 </script>
