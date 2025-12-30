@@ -5,65 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TLC - Protezione Civile Toscolano Maderno</title>
 
-    <!-- CSS di Leaflet (Protocollo HTTPS esplicito) -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="unpkg.com" crossorigin="anonymous" />
     
     <style>
-        /* Struttura bloccata per evitare errori di rendering su GitHub */
-        html, body { 
-            height: 100%; 
-            margin: 0; 
-            padding: 0;
-            display: flex; 
-            flex-direction: column; 
-            font-family: Arial, sans-serif;
-        }
-
+        html, body { height: 100%; margin: 0; display: flex; flex-direction: column; font-family: sans-serif; }
+        
         .pc-header {
-            background-color: #003399; 
-            color: #ffffff; 
-            padding: 15px;
-            border-bottom: 4px solid #ffcc00;
-            text-align: center;
-            flex-shrink: 0;
+            background-color: #003399; color: white; padding: 15px;
+            border-bottom: 4px solid #ffcc00; text-align: center; flex-shrink: 0;
         }
 
         .controls {
-            background: #ffffff;
-            padding: 10px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            border-bottom: 1px solid #ccc;
-            flex-shrink: 0;
+            background: white; padding: 10px; display: flex; gap: 8px;
+            flex-wrap: wrap; justify-content: center; border-bottom: 1px solid #ccc; flex-shrink: 0;
         }
 
-        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 8px 15px; cursor: pointer; border-radius: 4px; border: none; font-weight: bold; color: white; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 140px; }
+        button { padding: 8px 15px; cursor: pointer; border-radius: 4px; border: none; font-weight: bold; }
         .btn-gps { background-color: #ffcc00; color: #003399; }
-        .btn-add { background-color: #003399; }
+        .btn-add { background-color: #003399; color: white; }
 
-        /* Altezza forzata della mappa */
-        #map { 
-            flex: 1 1 auto; /* Occupa tutto lo spazio disponibile */
-            width: 100%; 
-            min-height: 500px; /* Altezza minima garantita */
-            background-color: #e5e3df; 
-        }
+        /* Mappa */
+        #map { flex-grow: 1; width: 100%; background: #e0e0e0; }
 
         .pc-footer {
-            background-color: #003399; 
-            color: white; 
-            padding: 10px;
-            border-top: 2px solid #ffcc00;
-            text-align: center;
-            font-size: 0.8rem;
-            flex-shrink: 0;
+            background-color: #003399; color: white; padding: 10px;
+            border-top: 2px solid #ffcc00; text-align: center; font-size: 0.8rem; flex-shrink: 0;
         }
-
-        /* Forza la visibilità delle icone Leaflet */
-        .leaflet-container { height: 100%; width: 100%; }
     </style>
 </head>
 <body>
@@ -86,30 +55,39 @@
         Versione 2025 | Creatore: Matteo Podavini &reg;
     </footer>
 
-    <!-- JS di Leaflet (HTTPS esplicito) -->
+    <!-- Leaflet JS -->
     <script src="unpkg.com" crossorigin="anonymous"></script>
 
     <script>
-        // Inizializzazione sicura
+        // 1. Definizione dei due tipi di mappa
+        var stradale = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        });
+
+        var satellite = L.tileLayer('mt1.google.com{x}&y={y}&z={z}', {
+            attribution: '&copy; Google Maps'
+        });
+
+        // 2. Inizializzazione mappa (parte con stradale)
         var map = L.map('map', {
-            zoomControl: true 
-        }).setView([45.6415, 10.6083], 13);
+            center: [45.6415, 10.6083],
+            zoom: 13,
+            layers: [stradale], // Default
+            zoomControl: true
+        });
 
-        // Uso di TileLayer HTTPS (Standard OSM)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        // 3. Aggiunta selettore in alto a destra per cambiare mappa
+        var baseMaps = {
+            "Mappa Stradale": stradale,
+            "Satellite": satellite
+        };
+        L.control.layers(baseMaps).addTo(map);
 
-        // Fix per GitHub Pages: forza il ridisegno dopo il caricamento
+        // Funzione per correggere il problema del grigio al caricamento
         function fixMap() {
-            window.dispatchEvent(new Event('resize'));
             map.invalidateSize();
         }
-
-        window.onload = function() {
-            setTimeout(fixMap, 500);
-        };
+        window.onload = function() { setTimeout(fixMap, 500); };
 
         function rilevaPosizione() {
             if (!navigator.geolocation) { alert("GPS non supportato"); return; }
@@ -119,19 +97,17 @@
                 document.getElementById('lat').value = lt;
                 document.getElementById('lng').value = lg;
                 map.setView([lt, lg], 16);
-                L.marker([lt, lg]).addTo(map).bindPopup("Posizione Unità").openPopup();
-            }, function(err) { alert("Attivare il GPS sul dispositivo"); });
+                L.marker([lt, lg]).addTo(map).bindPopup("Unità TLC").openPopup();
+            }, function() { alert("Attiva il GPS."); });
         }
 
         function aggiungiPunto() {
-            var n = document.getElementById('nomePunto').value || "Punto TLC";
+            var n = document.getElementById('nomePunto').value || "Unità";
             var la = parseFloat(document.getElementById('lat').value);
             var lo = parseFloat(document.getElementById('lng').value);
             if (!isNaN(la) && !isNaN(lo)) {
                 L.marker([la, lo]).addTo(map).bindPopup(n).openPopup();
                 map.flyTo([la, lo], 15);
-            } else {
-                alert("Inserire coordinate.");
             }
         }
     </script>
