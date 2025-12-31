@@ -276,13 +276,27 @@
     }
 
     function loadCam(id) {
-        const urlInput = document.getElementById('url-' + id).value.trim();
-        const screen = document.getElementById('screen-' + id);
-        if (!urlInput) return;
-        screen.innerHTML = `<div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem; z-index:10">LIVE - ${id.toUpperCase()}</div>
-        <iframe src="${urlInput}" style="width:100%; height:100%; border:none;"></iframe>`;
-        addLog(`Sorgente video ${id.toUpperCase()} caricata.`);
-    }
+    const urlInput = document.getElementById('url-' + id).value.trim();
+    const screen = document.getElementById('screen-' + id);
+    
+    if (!urlInput) return;
+
+    // Usiamo un tag <img> se è uno snapshot o MJPEG, altrimenti <iframe>
+    // Aggiungiamo object-fit: contain per mantenere le proporzioni corrette
+    screen.innerHTML = `
+        <div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem; z-index:10">
+            LIVE - ${id.toUpperCase()}
+        </div>
+        <img src="${urlInput}" 
+             style="width:100%; height:100%; object-fit: contain; background: #000;" 
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <iframe src="${urlInput}" 
+                style="width:100%; height:100%; border:none; display:none;">
+        </iframe>`;
+    
+    addLog(`Sorgente video ${id.toUpperCase()} caricata con proporzioni corrette.`);
+}
+
 
     async function runCountdown(duration) {
         const display = document.getElementById('countdown-display');
