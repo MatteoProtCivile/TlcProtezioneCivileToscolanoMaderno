@@ -6,18 +6,15 @@
     <title>Protezione Civile TLC - Toscolano Maderno</title>
     
     <!-- CSS di Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-    <!-- CSS righello (Leaflet.PolylineMeasure) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.polylinemeasure@3.0.0/Leaflet.PolylineMeasure.css" />
+    <link rel="stylesheet" href="unpkg.com" />
+    <!-- CSS righello -->
+    <link rel="stylesheet" href="unpkg.com" />
     
     <style>
         body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; }
         .pc-header { background-color: #003399; color: #ffffff; padding: 15px; text-align: center; border-bottom: 5px solid #ffcc00; }
         .controls { background: #ffffff; padding: 10px 15px; border-bottom: 1px solid #ccc; position: relative; z-index: 1000; }
         .controls-top { text-align: center; margin-bottom: 8px; }
-        .controls-filters { font-size: 0.9em; text-align: center; }
-        .controls-filters label { margin: 0 5px; white-space: nowrap; }
         input, select { margin: 5px; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
         button { padding: 6px 12px; cursor: pointer; background: #003399; color: white; border: none; border-radius: 4px; font-weight: bold; margin: 5px; }
         .btn-gps { background: #ffcc00; color: #003399; }
@@ -25,10 +22,8 @@
         .btn-excel { background: #28a745; }
         #map { height: 600px; width: 100%; border-bottom: 1px solid #ccc; }
         .pc-footer { background-color: #003399; color: white; text-align: center; padding: 10px; font-size: 0.8em; border-top: 3px solid #ffcc00; }
-        
-        .legend { background: white; padding: 12px; line-height: 20px; color: #333; border: 2px solid #003399; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-        .legend b { display: block; margin-bottom: 5px; border-bottom: 1px solid #ccc; }
-        .legend i { width: 16px; height: 16px; float: left; margin-right: 10px; opacity: 1; border-radius: 50%; border: 1px solid #333; }
+        .legend { background: white; padding: 12px; line-height: 20px; border: 2px solid #003399; border-radius: 5px; }
+        .legend i { width: 16px; height: 16px; float: left; margin-right: 10px; border-radius: 50%; border: 1px solid #333; }
     </style>
 </head>
 <body>
@@ -59,8 +54,7 @@
             <button class="btn-delete" onclick="svuotaMappa()">🗑️ RESET</button>
         </div>
 
-        <!-- FILTRI PER TIPO DI UNITÀ -->
-        <div class="controls-filters">
+        <div class="controls-filters" style="text-align:center; font-size:0.9em;">
             <strong>Filtra unità:</strong>
             <label><input type="checkbox" class="filter-checkbox" data-color="blue" checked> Standard</label>
             <label><input type="checkbox" class="filter-checkbox" data-color="red" checked> Emergenza</label>
@@ -77,61 +71,55 @@
     </div>
 
     <!-- Script Librerie -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.polylinemeasure@3.0.0/Leaflet.PolylineMeasure.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="unpkg.com"></script>
+    <script src="unpkg.com"></script>
+    <script src="cdn.jsdelivr.net"></script>
     
     <script>
-        // Inizializzazione mappa
+        // 1. Inizializzazione Mappa
         var map = L.map('map').setView([45.6415, 10.6083], 13);
 
-        // Layer di base: strade (OSM) e satellite (Esri)
+        // 2. Click sulla mappa per catturare coordinate (MODIFICA RICHIESTA)
+        map.on('click', function(e) {
+            document.getElementById('lat').value = e.latlng.lat.toFixed(6);
+            document.getElementById('lng').value = e.latlng.lng.toFixed(6);
+        });
+
+        // 3. Layer Strade e Satellite
         var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        var satellite = L.tileLayer('server.arcgisonline.com{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri'
         });
 
-        var satellite = L.tileLayer(
-            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri'
-        });
+        var baseMaps = { "Strade": streets, "Satellite": satellite };
+        L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-        // Di default: strade
-        streets.addTo(map);
+        // 4. Righello (MODIFICA RICHIESTA - Icona forzata con emoji)
+        L.control.polylineMeasure({
+            position: 'topleft',
+            unit: 'metres',
+            measureControlLabel: '📏', 
+            clearControlTitle: 'Cancella'
+        }).addTo(map);
 
-        // LayerGroup per colore (per il filtro)
+        // 5. Gestione Unità e Colori
         var layersByColor = {
-            blue:   L.layerGroup().addTo(map),
-            red:    L.layerGroup().addTo(map),
-            green:  L.layerGroup().addTo(map),
+            blue: L.layerGroup().addTo(map),
+            red: L.layerGroup().addTo(map),
+            green: L.layerGroup().addTo(map),
             orange: L.layerGroup().addTo(map),
             yellow: L.layerGroup().addTo(map)
         };
 
         var salvataggioPOI = JSON.parse(localStorage.getItem('poi_data')) || [];
 
-        // Controllo per cambiare base map (in alto a destra)
-        var baseMaps = {
-            "Strade": streets,
-            "Satellite": satellite
-        };
-        L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
-
-        // Righello (anche se ora non lo vedi, resta configurato)
-        L.control.polylineMeasure({
-            position: 'topleft',
-            unit: 'metres',
-            showBearings: true,
-            clearControlTitle: 'Cancella misurazioni',
-            measureControlLabel: 'MIS',
-            measureControlTitleOn: 'Attiva misurazione distanze',
-            measureControlTitleOff: 'Disattiva misurazione distanze'
-        }).addTo(map);
-
-        // Icone colorate
         function getIcon(color) {
             return new L.Icon({
-                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + '.png',
-                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconUrl: 'raw.githubusercontent.com' + color + '.png',
+                shadowUrl: 'unpkg.com',
                 iconSize: [25, 41],
                 iconAnchor: [12, 41],
                 popupAnchor: [1, -34],
@@ -139,21 +127,32 @@
             });
         }
 
-        // Renderizza tutti i POI salvati
+        function renderizzaMarker(poi) {
+            var color = poi.color || 'blue';
+            var marker = L.marker([poi.lat, poi.lng], {icon: getIcon(color)})
+                .bindPopup('<b>' + poi.nome + '</b><br>Lat: ' + poi.lat + '<br>Lng: ' + poi.lng);
+            marker.addTo(layersByColor[color]);
+        }
+
         window.onload = function() {
             salvataggioPOI.forEach(poi => renderizzaMarker(poi));
-            setTimeout(function(){ map.invalidateSize(); }, 500);
             inizializzaFiltri();
         };
 
-        function renderizzaMarker(poi) {
-            var color = poi.color || 'blue';
-            var layerGroup = layersByColor[color] || layersByColor.blue;
+        function aggiungiPunto() {
+            var lat = parseFloat(document.getElementById('lat').value);
+            var lng = parseFloat(document.getElementById('lng').value);
+            var nome = document.getElementById('poiName').value || "Unità TLC";
+            var colore = document.getElementById('poiColor').value;
 
-            var marker = L.marker([poi.lat, poi.lng], {icon: getIcon(color)})
-                .bindPopup('<b>' + poi.nome + '</b><br>Lat: ' + poi.lat + '<br>Lng: ' + poi.lng + '<br>Tipo: ' + color);
-
-            marker.addTo(layerGroup);
+            if (lat && lng) {
+                var nuovoPOI = { lat: lat, lng: lng, nome: nome, color: colore };
+                salvataggioPOI.push(nuovoPOI);
+                localStorage.setItem('poi_data', JSON.stringify(salvataggioPOI));
+                renderizzaMarker(nuovoPOI);
+            } else {
+                alert("Seleziona un punto sulla mappa o usa il GPS.");
+            }
         }
 
         function rilevaPosizione() {
@@ -165,66 +164,40 @@
             });
         }
 
-        function aggiungiPunto() {
-            var lat = parseFloat(document.getElementById('lat').value);
-            var lng = parseFloat(document.getElementById('lng').value);
-            var nome = document.getElementById('poiName').value || "Unità TLC";
-            var colore = document.getElementById('poiColor').value;
-
-            if (lat && lng) {
-                var nuovoPOI = { lat: lat, lng: lng, nome: nome, color: colore, data: new Date().toLocaleString() };
-                salvataggioPOI.push(nuovoPOI);
-                localStorage.setItem('poi_data', JSON.stringify(salvataggioPOI));
-                renderizzaMarker(nuovoPOI);
-                map.setView([lat, lng], 15);
-            } else {
-                alert("Inserisci coordinate valide.");
-            }
-        }
-
-        function svuotaMappa() {
-            if(confirm("Cancellare tutti i punti?")) {
-                localStorage.removeItem('poi_data');
-                salvataggioPOI = [];
-                Object.keys(layersByColor).forEach(function(color) {
-                    layersByColor[color].clearLayers();
-                });
-            }
-        }
-
         function esportaExcel() {
             if(salvataggioPOI.length === 0) return alert("Nessun dato.");
             var worksheet = XLSX.utils.json_to_sheet(salvataggioPOI);
             var workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "POI_TLC");
-            XLSX.writeFile(workbook, "Mappa_TLC.xlsx");
+            XLSX.writeFile(workbook, "Mappa_TLC_2025.xlsx");
         }
 
-        // Gestione filtri
+        function svuotaMappa() {
+            if(confirm("Cancellare tutti i dati?")) {
+                localStorage.removeItem('poi_data');
+                location.reload();
+            }
+        }
+
         function inizializzaFiltri() {
-            var checkboxes = document.querySelectorAll('.filter-checkbox');
-            checkboxes.forEach(function(cb) {
+            document.querySelectorAll('.filter-checkbox').forEach(cb => {
                 cb.addEventListener('change', function() {
                     var color = this.getAttribute('data-color');
-                    if (this.checked) {
-                        layersByColor[color].addTo(map);
-                    } else {
-                        map.removeLayer(layersByColor[color]);
-                    }
+                    if (this.checked) map.addLayer(layersByColor[color]);
+                    else map.removeLayer(layersByColor[color]);
                 });
             });
         }
 
-        // Legenda dei POI
         var legend = L.control({position: 'bottomright'});
-        legend.onAdd = function (map) {
+        legend.onAdd = function () {
             var div = L.DomUtil.create('div', 'legend');
-            div.innerHTML += '<b>LEGENDA UNITÀ</b><br>';
-            div.innerHTML += '<i style="background: #2a82cb"></i> Standard<br>';
-            div.innerHTML += '<i style="background: #cb2b3e"></i> Emergenza<br>';
-            div.innerHTML += '<i style="background: #2aad27"></i> Sanità<br>';
-            div.innerHTML += '<i style="background: #cb832b"></i> Logistica<br>';
-            div.innerHTML += '<i style="background: #ffc107"></i> Coordinamento<br>';
+            div.innerHTML = '<b>LEGENDA</b><br>' +
+                '<i style="background: #2a82cb"></i> Standard<br>' +
+                '<i style="background: #cb2b3e"></i> Emergenza<br>' +
+                '<i style="background: #2aad27"></i> Sanità<br>' +
+                '<i style="background: #cb832b"></i> Logistica<br>' +
+                '<i style="background: #ffc107"></i> Coord.';
             return div;
         };
         legend.addTo(map);
