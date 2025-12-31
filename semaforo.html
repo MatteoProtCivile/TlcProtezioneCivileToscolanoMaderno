@@ -6,67 +6,47 @@
     <title>SISTEMA TLC v4.0 - Protezione Civile Toscolano Maderno</title>
     <style>
         :root {
-            --pc-blue: #003366;
-            --pc-yellow: #ffcc00;
-            --pc-bg: #d1d8e0;
-            --status-green: #28a745;
-            --status-orange: #ff9f1c;
-            --status-red: #dc3545;
+            --pc-blue: #003366; --pc-yellow: #ffcc00; --pc-bg: #d1d8e0;
+            --status-green: #28a745; --status-orange: #ff9f1c; --status-red: #dc3545;
             --emergency-blue: #0055ff;
         }
-
-        body {
-            background-color: var(--pc-bg);
-            color: #212529;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* HEADER */
-        .header-istituzionale {
-            background-color: var(--pc-blue); color: white;
-            padding: 10px 25px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 4px solid var(--pc-yellow); box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-            width: 100%; box-sizing: border-box;
-        }
-        .header-brand { display: flex; align-items: center; gap: 12px; }
+        body { background-color: var(--pc-bg); color: #212529; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        .header-istituzionale { background-color: var(--pc-blue); color: white; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--pc-yellow); box-shadow: 0 3px 10px rgba(0,0,0,0.3); width: 100%; box-sizing: border-box; }
         .label-pc { background-color: var(--pc-yellow); color: var(--pc-blue); padding: 5px 15px; font-weight: 900; border-radius: 4px; font-size: 1.4rem; text-transform: uppercase; }
         .titolo-comune { font-weight: 900; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
         
         .op-box { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 6px; border: 1px solid var(--pc-yellow); }
         .op-box label { color: var(--pc-yellow); font-weight: bold; font-size: 0.75rem; text-transform: uppercase; }
         .op-box input { background: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: 900; text-transform: uppercase; color: var(--pc-blue); width: 180px; }
-
+        
         .datetime-display { font-family: 'Consolas', monospace; font-weight: bold; font-size: 1.1rem; color: var(--pc-yellow); text-align: right; }
+        #countdown-display { background: #000; color: var(--pc-yellow); padding: 5px 15px; border-radius: 5px; font-family: 'Consolas', monospace; font-size: 1.2rem; font-weight: bold; border: 1px solid var(--pc-yellow); min-width: 120px; text-align: center; display: none; }
+        
+        .top-buttons-row { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 1850px; margin-bottom: 5px; margin-top: 15px; }
+        .top-btn-container { flex: 1; min-width: 600px; max-width: 850px; display: flex; justify-content: center; }
 
-        /* NUOVO STILE COUNTDOWN AGGIUNTO */
-        #countdown-display {
-            background: #000;
-            color: var(--pc-yellow);
-            padding: 5px 15px;
-            border-radius: 5px;
-            font-family: 'Consolas', monospace;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: 1px solid var(--pc-yellow);
-            min-width: 120px;
-            text-align: center;
-            display: none; /* Nascosto di default, appare in automatico */
-        }
-
-        /* LAYOUT UNITÀ */
         .main-container { display: flex; flex-direction: column; align-items: center; padding: 15px; gap: 15px; flex: 1; }
         .row-controlli { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1850px; }
         .control-module { background: white; border: 2px solid var(--pc-blue); border-radius: 10px; flex: 1; min-width: 600px; max-width: 850px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .status-header { padding: 12px 18px; background: #f8f9fa; border-bottom: 2px solid var(--pc-blue); color: var(--pc-blue); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+        
+        .status-header { padding: 12px 18px; background: #f8f9fa; border-bottom: 2px solid var(--pc-blue); color: var(--pc-blue); display: flex; justify-content: space-between; align-items: center; }
+        .postazione-nome { font-weight: 800; font-size: 1.1rem; text-transform: uppercase; border-bottom: 1px dashed #666; cursor: pointer; }
+
+        .istruzioni-box { width: 100%; max-width: 1820px; background: #fff; border: 2px solid var(--pc-blue); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .istruzioni-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+        .istr-item { font-size: 0.85rem; padding: 20px; border-right: 1px solid #ddd; line-height: 1.5; }
+        .istr-item:last-child { border-right: none; }
+        .istr-item strong { color: var(--pc-blue); display: block; margin-bottom: 8px; text-transform: uppercase; border-bottom: 2px solid var(--pc-yellow); }
+
+        .log-section { width: 100%; max-width: 1820px; margin-top: 15px; }
+        .log-area { background: #111; color: #00ff00; font-family: 'Consolas', monospace; padding: 12px; height: 150px; overflow-y: scroll; border: 2px solid #333; display: flex; flex-direction: column-reverse; }
 
         .ping-box { padding: 5px 15px; border-radius: 6px; font-size: 0.9rem; font-weight: 900; text-transform: uppercase; color: white; min-width: 110px; text-align: center; }
         .online-bg { background-color: var(--status-green); }
         .offline-bg { background-color: var(--status-red); animation: blink-soft 2s infinite; }
-
-        .status-label { padding: 8px 18px; border-radius: 25px; font-size: 0.9rem; text-transform: uppercase; font-weight: 900; min-width: 200px; text-align: center; }
+        
+        .status-label { padding: 8px 18px; border-radius: 25px; font-size: 0.9rem; text-transform: uppercase; font-weight: 900; min-width: 160px; text-align: center; }
         .status-label.chiuso { background: var(--status-red); color: white; }
         .status-label.aperto { background: var(--status-green); color: white; }
         .status-label.attesa { background: var(--status-orange); color: white; animation: blink-chromatic 0.6s infinite alternate; }
@@ -83,46 +63,11 @@
         .action-btn { width: 100%; height: 60px; border: 3px solid; font-weight: 900; cursor: pointer; border-radius: 8px; font-size: 1.1rem; text-transform: uppercase; }
         .btn-alt { background: #fff1f0; color: var(--status-red); border-color: var(--status-red); }
         .btn-vai { background: #f6ffed; color: var(--status-green); border-color: var(--status-green); }
-
-        .cam-square { width: 100%; height: 350px; background: #000; position: relative; border-radius: 6px; overflow: hidden; border: 2px solid #333; }
-        .cam-square iframe { width: 100%; height: 100%; border: none; }
-
-        .top-buttons-row { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 1850px; margin-bottom: 5px; }
-        .top-btn-container { flex: 1; min-width: 600px; max-width: 850px; display: flex; justify-content: center; }
-
-        .btn-emergency-small { 
-            background: linear-gradient(135deg, #ff0000 0%, #990000 100%); 
-            color: white; border: 3px solid #ffffff; padding: 12px 0;
-            font-size: 1.1rem; font-weight: 900; cursor: pointer; border-radius: 8px; 
-            text-transform: uppercase; width: 100%; transition: all 0.4s ease-in-out;
-        }
-
-        .btn-neutral {
-            background: var(--pc-blue); color: white; border: 3px solid white;
-            padding: 12px 0; font-size: 1.1rem; font-weight: 900;
-            border-radius: 8px; text-transform: uppercase; width: 100%;
-            cursor: pointer;
-        }
-        .btn-emergency:not(.active) { animation: pulse-blue-soft 3s infinite ease-in-out; }
-        .btn-emergency.active { background: #ff0000; animation: emergency-glow-soft 1s infinite ease-in-out; box-shadow: 0 0 30px #ff0000; }
-
-        @keyframes pulse-blue-soft {
-            0%, 100% { box-shadow: 0 0 10px rgba(0, 85, 255, 0.3); border-color: #ffffff; }
-            50% { box-shadow: 0 0 25px var(--emergency-blue); border-color: var(--emergency-blue); }
-        }
-        @keyframes emergency-glow-soft {
-            0%, 100% { background: #ff0000; color: white; transform: scale(1); }
-            50% { background: #ffffff; color: #ff0000; transform: scale(1.02); }
-        }
-
-        .istruzioni-box { width: 100%; max-width: 1820px; background: #fff; border: 2px solid var(--pc-blue); border-radius: 10px; overflow: hidden; margin-top: 10px; }
-        .istruzioni-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
-        .istr-item { font-size: 0.85rem; padding: 20px; border-right: 1px solid #ddd; line-height: 1.5; }
-        .istr-item:last-child { border-right: none; }
-        .istr-item strong { color: var(--pc-blue); display: block; margin-bottom: 8px; text-transform: uppercase; border-bottom: 2px solid var(--pc-yellow); }
         
-        .log-area { background: #111; color: #00ff00; font-family: 'Consolas', monospace; padding: 12px; height: 150px; overflow-y: scroll; border: 2px solid #333; display: flex; flex-direction: column-reverse; }
-
+        .cam-square { width: 100%; height: 350px; background: #000; position: relative; border-radius: 6px; overflow: hidden; border: 2px solid #333; }
+        .btn-emergency-small { background: linear-gradient(135deg, #ff0000 0%, #990000 100%); color: white; border: 3px solid #ffffff; padding: 12px 0; font-size: 1.1rem; font-weight: 900; cursor: pointer; border-radius: 8px; text-transform: uppercase; width: 100%; }
+        .btn-neutral { background: var(--pc-blue); color: white; border: 3px solid white; padding: 12px 0; font-size: 1.1rem; font-weight: 900; border-radius: 8px; text-transform: uppercase; width: 100%; cursor: pointer; }
+        
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; }
         @keyframes blink-chromatic { from { background: var(--status-orange); } to { background: #ffcc00; color: var(--pc-blue); } }
         @keyframes blink-hard { 0%, 100% { background: #000; color: #fff; } 50% { background: #ff0000; color: #fff; } }
@@ -130,7 +75,6 @@
     </style>
 </head>
 <body>
-
     <!-- MODALI DI SICUREZZA -->
     <div id="modalEmergency" class="modal-overlay">
         <div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:500px; border: 8px solid var(--status-red);">
@@ -155,12 +99,10 @@
             <span class="label-pc">Protezione Civile</span>
             <h1 class="titolo-comune">TOSCOLANO MADERNO</h1>
         </div>
-
         <div class="op-box">
             <label>Operatore:</label>
             <input type="text" id="operatore-name" placeholder="NOME COGNOME" required>
         </div>
-
         <div class="datetime-display">
             <div id="clock-display">--:--:--</div>
             <span id="date-display" style="font-size:0.8rem; color:white">--/--/----</span>
@@ -168,156 +110,143 @@
     </header>
 
     <div class="main-container">
-	 <!-- RIGA PULSANTI SOPRA I SEMAFORI -->
-    <div class="top-buttons-row">
-        <div class="top-btn-container">
-            <button id="main-emergency" class="btn-emergency-small" onclick="handleEmergencyClick()">
-                🚨 EMERGENZA CHIUSURA STRADA 🚨
-            </button>
-        </div>
-
-        <div class="top-btn-container">
-           <button id="btn-auto-main" class="btn-neutral" onclick="toggleProgramBar()">
-              AUTOMATICO <span id="auto-status-label" style="font-size:0.8rem; opacity:0.8;">[OFF]</span>
-            </button>
-        </div>
-    </div>
-
-    <div class="row-controlli">
-        <!-- UNITA 01 - NORD -->
-        <div class="control-module">
-    <div class="status-header">
-        <div style="display:flex; align-items:center; gap:10px">
-            <!-- Aggiunto attributo contenteditable -->
-            <span id="nome-postazione" contenteditable="true" style="border-bottom: 1px dashed #666; cursor: pointer;">
-                POSTAZIONE - 01
-            </span>
-                    <div id="node-sem1" class="ping-box offline-bg">OFFLINE</div>
-                </div>
-                <span id="label-sem1" class="status-label chiuso">● CHIUSO</span>
+        <!-- PULSANTI AFFIANCATI -->
+        <div class="top-buttons-row">
+            <div class="top-btn-container">
+                <button id="main-emergency" class="btn-emergency-small" onclick="handleEmergencyClick()">
+                    🚨 EMERGENZA CHIUSURA STRADA 🚨
+                </button>
             </div>
-            <div class="module-content">
-                <div class="semaforo-col">
-                    <div class="traffic-box" id="sem1">
-                        <div class="light-unit red active"></div>
-                        <div class="light-unit orange"></div>
-                        <div class="light-unit green"></div>
-                    </div>
-                    <div class="btn-group-vertical">
-                        <button class="action-btn btn-alt" onclick="updateSem('sem1','r')">ALT</button>
-                        <button class="action-btn btn-vai" onclick="updateSem('sem1','v')">VAI</button>
-                    </div>
-                </div>
-                <div class="cam-wrapper" style="flex:1">
-                    <div class="cam-square" id="screen-sem1">
-                        <div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem">TLC NORD_01</div>
-                    </div>
-                    <div style="margin-top:10px; display:flex; gap:5px;">
-                        <input type="text" id="url-sem1" placeholder="IP Camera" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ccc">
-                        <button onclick="loadCam('sem1')" style="padding:0 15px; background:var(--pc-blue); color:white; border:none; border-radius:4px; cursor:pointer">OK</button>
-                    </div>
-                </div>
+            <div class="top-btn-container">
+               <button id="btn-auto-main" class="btn-neutral" onclick="toggleProgramBar()">
+                  AUTOMATICO <span id="auto-status-label" style="font-size:0.8rem; opacity:0.8;">[OFF]</span>
+                </button>
             </div>
         </div>
 
-        <!-- UNITA 02 - SUD -->
-        <div class="control-module">
-    <div class="status-header">
-        <div style="display:flex; align-items:center; gap:10px">
-            <!-- Aggiunto attributo contenteditable -->
-            <span id="nome-postazione" contenteditable="true" style="border-bottom: 1px dashed #666; cursor: pointer;">
-                POSTAZIONE - 02
-            </span>
-                    <div id="node-sem2" class="ping-box offline-bg">OFFLINE</div>
+        <div class="row-controlli">
+            <!-- UNITA 01 -->
+            <div class="control-module">
+                <div class="status-header">
+                    <span id="nome-postazione-1" class="postazione-nome" contenteditable="true">POSTAZIONE - 01</span>
+                    <div style="display:flex; align-items:center; gap:10px">
+                        <div id="node-sem1" class="ping-box offline-bg">OFFLINE</div>
+                        <span id="label-sem1" class="status-label chiuso">● CHIUSO</span>
+                    </div>
                 </div>
-                <span id="label-sem2" class="status-label chiuso">● CHIUSO</span>
+                <div class="module-content">
+                    <div class="semaforo-col">
+                        <div class="traffic-box" id="sem1">
+                            <div class="light-unit red active"></div>
+                            <div class="light-unit orange"></div>
+                            <div class="light-unit green"></div>
+                        </div>
+                        <div class="btn-group-vertical">
+                            <button class="action-btn btn-alt" onclick="updateSem('sem1','r')">ALT</button>
+                            <button class="action-btn btn-vai" onclick="updateSem('sem1','v')">VAI</button>
+                        </div>
+                    </div>
+                    <div class="cam-wrapper" style="flex:1">
+                        <div class="cam-square" id="screen-sem1">
+                            <div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem">TLC NORD_01</div>
+                        </div>
+                        <div style="margin-top:10px; display:flex; gap:5px;">
+                            <input type="text" id="url-sem1" placeholder="IP Camera" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ccc">
+                            <button onclick="loadCam('sem1')" style="padding:0 15px; background:var(--pc-blue); color:white; border:none; border-radius:4px; cursor:pointer">OK</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="module-content">
-                <div class="semaforo-col">
-                    <div class="traffic-box" id="sem2">
-                        <div class="light-unit red active"></div>
-                        <div class="light-unit orange"></div>
-                        <div class="light-unit green"></div>
-                    </div>
-                    <div class="btn-group-vertical">
-                        <button class="action-btn btn-alt" onclick="updateSem('sem2','r')">ALT</button>
-                        <button class="action-btn btn-vai" onclick="updateSem('sem2','v')">VAI</button>
+
+            <!-- UNITA 02 -->
+            <div class="control-module">
+                <div class="status-header">
+                    <span id="nome-postazione-2" class="postazione-nome" contenteditable="true">POSTAZIONE - 02</span>
+                    <div style="display:flex; align-items:center; gap:10px">
+                        <div id="node-sem2" class="ping-box offline-bg">OFFLINE</div>
+                        <span id="label-sem2" class="status-label chiuso">● CHIUSO</span>
                     </div>
                 </div>
-                <div class="cam-wrapper" style="flex:1">
-                    <div class="cam-square" id="screen-sem2">
-                        <div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem">TLC SUD_02</div>
+                <div class="module-content">
+                    <div class="semaforo-col">
+                        <div class="traffic-box" id="sem2">
+                            <div class="light-unit red active"></div>
+                            <div class="light-unit orange"></div>
+                            <div class="light-unit green"></div>
+                        </div>
+                        <div class="btn-group-vertical">
+                            <button class="action-btn btn-alt" onclick="updateSem('sem2','r')">ALT</button>
+                            <button class="action-btn btn-vai" onclick="updateSem('sem2','v')">VAI</button>
+                        </div>
                     </div>
-                    <div style="margin-top:10px; display:flex; gap:5px;">
-                        <input type="text" id="url-sem2" placeholder="IP Camera" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ccc">
-                        <button onclick="loadCam('sem2')" style="padding:0 15px; background:var(--pc-blue); color:white; border:none; border-radius:4px; cursor:pointer">OK</button>
+                    <div class="cam-wrapper" style="flex:1">
+                        <div class="cam-square" id="screen-sem2">
+                            <div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem">TLC SUD_02</div>
+                        </div>
+                        <div style="margin-top:10px; display:flex; gap:5px;">
+                            <input type="text" id="url-sem2" placeholder="IP Camera" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ccc">
+                            <button onclick="loadCam('sem2')" style="padding:0 15px; background:var(--pc-blue); color:white; border:none; border-radius:4px; cursor:pointer">OK</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- BARRA PROGRAMMAZIONE CON COUNTDOWN INTEGRATO -->
-    <div id="prog-bar" style="display:none; width:100%; max-width:1820px; background:white; border:2px solid var(--pc-blue); border-radius:10px; margin: 0 auto 15px auto; padding:15px; box-sizing:border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-        <div style="display:flex; align-items:center; gap:20px; justify-content:center; flex-wrap:wrap;">
-            <strong style="color:var(--pc-blue); text-transform:uppercase; font-size:0.85rem;">Programmazione Cicli:</strong>
-            
-            <div style="display:flex; align-items:center; gap:5px; border-right: 1px solid #ddd; padding-right:10px;">
-                <label style="font-weight:bold; color:var(--status-red); font-size:0.8rem;">ROSSO:</label>
-                <input type="number" id="tr-min" value="0" min="0" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">m</span>
-                <input type="number" id="tr-sec" value="10" min="0" max="59" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">s</span>
-            </div>
-
-            <div style="display:flex; align-items:center; gap:5px; border-right: 1px solid #ddd; padding-right:10px;">
-                <label style="font-weight:bold; color:var(--status-orange); font-size:0.8rem;">ARANCIO:</label>
-                <input type="number" id="to-min" value="0" min="0" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">m</span>
-                <input type="number" id="to-sec" value="10" min="0" max="59" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">s</span>
-            </div>
-
-            <div style="display:flex; align-items:center; gap:5px; border-right: 1px solid #ddd; padding-right:10px;">
-                <label style="font-weight:bold; color:var(--status-green); font-size:0.8rem;">VERDE:</label>
-                <input type="number" id="tg-min" value="0" min="0" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">m</span>
-                <input type="number" id="tg-sec" value="30" min="0" max="59" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">s</span>
-            </div>
-
-            <div style="display:flex; align-items:center; gap:5px; padding-right:10px;">
-                <label style="font-weight:bold; color:var(--pc-blue); font-size:0.8rem;">SGOMBERO:</label>
-                <input type="number" id="ts-min" value="0" min="0" style="width:40px; padding:4px; border:1px solid var(--pc-blue);"> <span style="font-size:0.7rem">m</span>
-                <input type="number" id="ts-sec" value="10" min="0" max="59" style="width:40px; padding:4px; border:1px solid var(--pc-blue);"> <span style="font-size:0.7rem">s</span>
-            </div>
-
-            <!-- SPAZIO PER IL COUNTDOWN DINAMICO -->
-            <div id="countdown-display">00:00</div>
-
-            <div style="display:flex; gap:8px;">
-                <button onclick="saveTempi()" style="background:var(--status-green); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">CONFERMA TEMPI</button>
-                <button id="btn-start-auto" onclick="toggleAutomation()" style="display:none; background:var(--emergency-blue); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">AVVIA AUTOMAZIONE</button>
-                <button onclick="toggleProgramBar()" style="background:var(--status-red); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">CHIUDI</button>
+        <!-- BARRA PROGRAMMAZIONE -->
+        <div id="prog-bar" style="display:none; width:100%; max-width:1820px; background:white; border:2px solid var(--pc-blue); border-radius:10px; margin: 0 auto 15px auto; padding:15px; box-sizing:border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <div style="display:flex; align-items:center; gap:20px; justify-content:center; flex-wrap:wrap;">
+                <strong style="color:var(--pc-blue); text-transform:uppercase; font-size:0.85rem;">Programmazione Cicli:</strong>
+                <div style="display:flex; align-items:center; gap:5px; border-right: 1px solid #ddd; padding-right:10px;">
+                    <label style="font-weight:bold; color:var(--status-red); font-size:0.8rem;">ROSSO:</label>
+                    <input type="number" id="tr-min" value="0" min="0" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">m</span>
+                    <input type="number" id="tr-sec" value="10" min="0" max="59" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">s</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:5px; border-right: 1px solid #ddd; padding-right:10px;">
+                    <label style="font-weight:bold; color:var(--status-orange); font-size:0.8rem;">ARANCIO:</label>
+                    <input type="number" id="to-min" value="0" min="0" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">m</span>
+                    <input type="number" id="to-sec" value="10" min="0" max="59" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">s</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:5px; border-right: 1px solid #ddd; padding-right:10px;">
+                    <label style="font-weight:bold; color:var(--status-green); font-size:0.8rem;">VERDE:</label>
+                    <input type="number" id="tg-min" value="0" min="0" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">m</span>
+                    <input type="number" id="tg-sec" value="30" min="0" max="59" style="width:40px; padding:4px;"> <span style="font-size:0.7rem">s</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:5px; padding-right:10px;">
+                    <label style="font-weight:bold; color:var(--pc-blue); font-size:0.8rem;">SGOMBERO:</label>
+                    <input type="number" id="ts-min" value="0" min="0" style="width:40px; padding:4px; border:1px solid var(--pc-blue);"> <span style="font-size:0.7rem">m</span>
+                    <input type="number" id="ts-sec" value="10" min="0" max="59" style="width:40px; padding:4px; border:1px solid var(--pc-blue);"> <span style="font-size:0.7rem">s</span>
+                </div>
+                <div id="countdown-display">00:00</div>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="saveTempi()" style="background:var(--status-green); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">CONFERMA TEMPI</button>
+                    <button id="btn-start-auto" onclick="toggleAutomation()" style="display:none; background:var(--emergency-blue); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">AVVIA AUTOMAZIONE</button>
+                    <button onclick="toggleProgramBar()" style="background:var(--status-red); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">CHIUDI</button>
+                </div>
             </div>
         </div>
-    </div>
-    <!-- BLOCCO ISTRUZIONI E LOG (Invariati) -->
-    <div class="istruzioni-box">
-        <div style="background:var(--pc-blue); color:white; padding:10px 20px; font-weight:bold; text-transform:uppercase; font-size:0.9rem">
-            Protocollo Operativo TLC - Toscolano Maderno (v4.0)
-        </div>
-        <div class="istruzioni-grid">
-            <div class="istr-item"><strong>1. Video & Rete</strong> La rete e gli stati sono sincronizzati con NAS.</div>
-            <div class="istr-item"><strong>2. Manuale</strong> Movimentazione manuale senza interblocchi, usare radio.</div>
-            <div class="istr-item"><strong>3. Automatico</strong> Inserire tempi di Rosso, Verde e Sgombero dal menù.</div>
-            <div class="istr-item"><strong>4. Emergenza</strong> Forza i Rossi su tutte le unità. Operatore obbligatorio.</div>
-        </div>
-    </div>
 
-    <div class="log-section" style="width:100%; max-width:1820px">
-        <div class="log-header" style="background: var(--pc-blue); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px 5px 0 0;">
-            <span>LOG EVENTI OPERATIVI (Sincronizzati)</span>
-            <div style="display:flex; gap:10px;">
-                <button onclick="downloadLog()" style="background:var(--pc-yellow); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:var(--pc-blue)">SCARICA (.TXT)</button>
-                <button onclick="if(confirm('Cancellare cronologia log?')) {localStorage.removeItem('pc_tlc_logs'); document.getElementById('event-log').innerHTML=''; addLog('Log pulito.');}" style="background:var(--status-red); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:white">PULISCI</button>
+        <!-- BOX ISTRUZIONI ORIGINALE -->
+        <div class="istruzioni-box">
+            <div style="background:var(--pc-blue); color:white; padding:10px 20px; font-weight:bold; text-transform:uppercase; font-size:0.9rem">
+                Protocollo Operativo TLC - Toscolano Maderno (v4.0)
+            </div>
+            <div class="istruzioni-grid">
+                <div class="istr-item"><strong>1. Video & Rete</strong> La rete e gli stati sono sincronizzati con NAS.</div>
+                <div class="istr-item"><strong>2. Manuale</strong> Movimentazione manuale senza interblocchi, usare radio.</div>
+                <div class="istr-item"><strong>3. Automatico</strong> Inserire tempi di Rosso, Verde e Sgombero dal menù.</div>
+                <div class="istr-item"><strong>4. Emergenza</strong> Forza i Rossi su tutte le unità. Operatore obbligatorio.</div>
             </div>
         </div>
-  <div id="event-log" class="log-area"></div>
+
+        <!-- LOG SECTION ORIGINALE -->
+        <div class="log-section">
+            <div class="log-header" style="background: var(--pc-blue); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px 5px 0 0;">
+                <span>LOG EVENTI OPERATIVI (Sincronizzati)</span>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="downloadLog()" style="background:var(--pc-yellow); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:var(--pc-blue)">SCARICA (.TXT)</button>
+                    <button onclick="if(confirm('Cancellare cronologia log?')) {localStorage.removeItem('pc_tlc_logs'); document.getElementById('event-log').innerHTML=''; addLog('Log pulito.');}" style="background:var(--status-red); border:none; cursor:pointer; font-weight:bold; font-size:0.75rem; padding:4px 12px; border-radius:3px; color:white">PULISCI</button>
+                </div>
+            </div>
+            <div id="event-log" class="log-area"></div>
         </div>
     </div>
     
@@ -328,108 +257,84 @@
 <script>
     let isEmergency = false;
     let isAutomaticMode = false;
-    
-     const netConfig = { 
-            sem1: '192.168.191.10', 
-            sem2: '192.168.191.17', 
-            nas:   '100.111.26.63:85/update.php'
-        };
-        const auth = "username=admin&password=Adminadmin01";
+    const netConfig = { sem1: '192.168.191.10', sem2: '192.168.191.17', nas: '100.111.26.63:85/update.php' };
+    const auth = "username=admin&password=Adminadmin01";
 
-    // --- NUOVA FUNZIONE: COUNTDOWN MINUTI:SECONDI ---
+    async function checkOnlineStatus() {
+        const nodes = [{ id: 'node-sem1', ip: netConfig.sem1 }, { id: 'node-sem2', ip: netConfig.sem2 }];
+        for (let node of nodes) {
+            const element = document.getElementById(node.id);
+            try {
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), 2000);
+                await fetch(`http://${node.ip}/`, { mode: 'no-cors', signal: controller.signal });
+                element.innerText = "ONLINE"; element.className = 'ping-box online-bg';
+            } catch (e) {
+                element.innerText = "OFFLINE"; element.className = 'ping-box offline-bg';
+            }
+        }
+    }
+
+    function loadCam(id) {
+        const urlInput = document.getElementById('url-' + id).value.trim();
+        const screen = document.getElementById('screen-' + id);
+        if (!urlInput) return;
+        screen.innerHTML = `<div style="position:absolute; top:8px; left:8px; color:#0f0; background:rgba(0,0,0,0.8); padding:2px 8px; font-size:0.8rem; z-index:10">LIVE - ${id.toUpperCase()}</div>
+        <iframe src="${urlInput}" style="width:100%; height:100%; border:none;"></iframe>`;
+        addLog(`Sorgente video ${id.toUpperCase()} caricata.`);
+    }
+
     async function runCountdown(duration) {
         const display = document.getElementById('countdown-display');
         display.style.display = 'block';
         let timeLeft = duration;
-
         while (timeLeft >= 0 && isAutomaticMode) {
-            let mins = Math.floor(timeLeft / 60);
-            let secs = timeLeft % 60;
-            display.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            display.innerText = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}`;
             await new Promise(r => setTimeout(r, 1000));
             timeLeft--;
         }
     }
 
-    // --- CORE HARDWARE (Invariato) ---
     async function setHardware(id, pin, action, time = "") {
-        const ip = netConfig[id];
-        const url = `http://${ip}/cgi-bin/output?${auth}&action=${action}&pin=${pin}&time=${time}`;
-        try { await fetch(url, { mode: 'no-cors' }); } catch (e) { console.error(`Errore Hardware ${id}: ${e}`); }
+        const url = `http://${netConfig[id]}/cgi-bin/output?${auth}&action=${action}&pin=${pin}&time=${time}`;
+        try { await fetch(url, { mode: 'no-cors' }); } catch (e) {}
     }
 
-    // --- AGGIORNAMENTO GRAFICA (Invariato) ---
     function updateUI(id, state) {
         const c = document.getElementById(id);
-        if (!c) return;
         const r = c.querySelector('.red'), o = c.querySelector('.orange'), g = c.querySelector('.green');
         const lbl = document.getElementById('label-' + id);
         [r, o, g].forEach(el => el?.classList.remove('active'));
-        if (state === 'ROSSO') { r?.classList.add('active'); if(lbl) { lbl.className = 'status-label chiuso'; lbl.innerText = "● CHIUSO"; } }
-        else if (state === 'VERDE') { g?.classList.add('active'); if(lbl) { lbl.className = 'status-label aperto'; lbl.innerText = "● APERTO"; } }
-        else if (state === 'ARANCIO') { o?.classList.add('active'); if(lbl) { lbl.className = 'status-label attesa'; lbl.innerText = "● ARANCIO"; } }
-        else if (state === 'SGOMBERO') { r?.classList.add('active'); if(lbl) { lbl.className = 'status-label attesa'; lbl.innerText = "● SGOMBERO"; } }
+        if (state === 'ROSSO') { r.classList.add('active'); lbl.className = 'status-label chiuso'; lbl.innerText = "● CHIUSO"; }
+        else if (state === 'VERDE') { g.classList.add('active'); lbl.className = 'status-label aperto'; lbl.innerText = "● APERTO"; }
+        else if (state === 'ARANCIO') { o.classList.add('active'); lbl.className = 'status-label attesa'; lbl.innerText = "● ARANCIO"; }
+        else if (state === 'SGOMBERO') { r.classList.add('active'); lbl.className = 'status-label attesa'; lbl.innerText = "● SGOMBERO"; }
     }
 
-    // --- LOGICA MANUALE (Invariato) ---
-    // --- LOGICA MANUALE CORRETTA ---
-function updateSem(id, type) {
-    const op = document.getElementById('operatore-name').value.trim();
-    if (!op) { alert("ATTENZIONE: Inserire il NOME OPERATORE."); return; }
-    if (isEmergency || isAutomaticMode) return;
-
-    // Recuperiamo l'elemento del semaforo e controlliamo se il rosso è già attivo
-    const semElement = document.getElementById(id);
-    const isRedActive = semElement.querySelector('.red').classList.contains('active');
-    const isGreenActive = semElement.querySelector('.green').classList.contains('active');
-
-    if (type === 'v') {
-        // Se è già verde, ignoriamo il comando
-        if (isGreenActive) return;
-
-        setHardware(id, 'relay', 'off', ''); 
-        setHardware(id, 'oc', 'on', ''); 
-        updateUI(id, 'VERDE'); 
-        addLog(`Unità ${id.toUpperCase()}: Apertura MANUALE.`); 
-    }
-    else if (type === 'r') {
-        // CORREZIONE: Se il semaforo è già ROSSO, interrompiamo la funzione
-        // impedendo che passi all'arancione
-        if (isRedActive) {
-            console.log(`Unità ${id.toUpperCase()} già in rosso. Azione annullata.`);
-            return; 
-        }
-
-        // Se non era rosso (era verde o arancio), allora eseguiamo la chiusura
-        updateUI(id, 'ARANCIO'); 
-        setHardware(id, 'oc', 'off', ''); 
-        addLog(`Unità ${id.toUpperCase()}: Fase Arancio (5s).`);
-
-        // TEMPO ARANCIONE ---
-        setTimeout(() => { 
-            // Controllo di sicurezza: se nel frattempo non è scattata un'emergenza
-            if (!isEmergency) {
-                setHardware(id, 'relay', 'on', ''); 
-                updateUI(id, 'ROSSO'); 
-                addLog(`Unità ${id.toUpperCase()}: Chiusura MANUALE.`); 
-            }
-        }, 5000);
-    }
-}
-
-
-    // --- LOGICA AUTOMAZIONE (CON COUNTDOWN INTEGRATO) ---
-    function toggleAutomation() {
+    function updateSem(id, type) {
         const op = document.getElementById('operatore-name').value.trim();
         if (!op) { alert("Inserire NOME OPERATORE."); return; }
+        if (isEmergency || isAutomaticMode) return;
+        const isRed = document.getElementById(id).querySelector('.red').classList.contains('active');
+        if (type === 'v') {
+            setHardware(id, 'relay', 'off'); setHardware(id, 'oc', 'on');
+            updateUI(id, 'VERDE'); addLog(`Unità ${id.toUpperCase()}: Apertura MANUALE.`);
+        } else if (type === 'r') {
+            if (isRed) return;
+            updateUI(id, 'ARANCIO'); setHardware(id, 'oc', 'off');
+            setTimeout(() => { if (!isEmergency) { setHardware(id, 'relay', 'on'); updateUI(id, 'ROSSO'); addLog(`Unità ${id.toUpperCase()}: Chiusura MANUALE.`); }}, 5000);
+        }
+    }
+
+    function toggleAutomation() {
+        if (!document.getElementById('operatore-name').value.trim()) { alert("Inserire NOME OPERATORE."); return; }
         isAutomaticMode = !isAutomaticMode;
         if (isAutomaticMode) {
             document.getElementById('btn-auto-main').style.background = "var(--status-green)";
             document.getElementById('auto-status-label').innerText = "[ATTIVA]";
             document.getElementById('btn-start-auto').innerText = "STOP AUTOMAZIONE";
             document.getElementById('btn-start-auto').style.background = "var(--status-red)";
-            addLog("MODO AUTOMATICO: ATTIVATO.");
-            startAutoCycle();
+            addLog("MODO AUTOMATICO: ATTIVATO."); startAutoCycle();
         } else { location.reload(); }
     }
 
@@ -437,64 +342,45 @@ function updateSem(id, type) {
         const t = JSON.parse(localStorage.getItem('pc_tlc_tempi_v4'));
         if(!t) return;
         while (isAutomaticMode) {
-            // 1. SEM1 VERDE
             updateUI('sem1', 'VERDE'); updateUI('sem2', 'ROSSO');
-            setHardware('sem2', 'oc', 'off', ''); setHardware('sem2', 'relay', 'on', '');
-            setHardware('sem1', 'relay', 'off', ''); setHardware('sem1', 'oc', 'on', t.verde);
+            setHardware('sem2', 'oc', 'off'); setHardware('sem2', 'relay', 'on');
+            setHardware('sem1', 'relay', 'off'); setHardware('sem1', 'oc', 'on');
             await runCountdown(t.verde); if(!isAutomaticMode) break;
-
-            // 2. SEM1 ARANCIO
-            updateUI('sem1', 'ARANCIO'); setHardware('sem1', 'oc', 'off', '');
+            updateUI('sem1', 'ARANCIO'); setHardware('sem1', 'oc', 'off');
             await runCountdown(t.arancio); if(!isAutomaticMode) break;
-
-            // 3. SGOMBERO
             updateUI('sem1', 'ROSSO'); updateUI('sem2', 'ROSSO');
-            setHardware('sem1', 'relay', 'on', ''); setHardware('sem2', 'relay', 'on', '');
+            setHardware('sem1', 'relay', 'on'); setHardware('sem2', 'relay', 'on');
             await runCountdown(t.sgombero); if(!isAutomaticMode) break;
-
-            // 4. SEM2 VERDE
             updateUI('sem2', 'VERDE'); updateUI('sem1', 'ROSSO');
-            setHardware('sem1', 'oc', 'off', ''); setHardware('sem1', 'relay', 'on', '');
-            setHardware('sem2', 'relay', 'off', ''); setHardware('sem2', 'oc', 'on', t.verde);
+            setHardware('sem1', 'oc', 'off'); setHardware('sem1', 'relay', 'on');
+            setHardware('sem2', 'relay', 'off'); setHardware('sem2', 'oc', 'on');
             await runCountdown(t.verde); if(!isAutomaticMode) break;
-
-            // 5. SEM2 ARANCIO
-            updateUI('sem2', 'ARANCIO'); setHardware('sem2', 'oc', 'off', '');
+            updateUI('sem2', 'ARANCIO'); setHardware('sem2', 'oc', 'off');
             await runCountdown(t.arancio); if(!isAutomaticMode) break;
-
-            // 6. SGOMBERO
             updateUI('sem1', 'ROSSO'); updateUI('sem2', 'ROSSO');
-            setHardware('sem1', 'relay', 'on', ''); setHardware('sem2', 'relay', 'on', '');
+            setHardware('sem1', 'relay', 'on'); setHardware('sem2', 'relay', 'on');
             await runCountdown(t.sgombero);
         }
     }
 
-    // --- EMERGENZA & UTILITY (Invariati) ---
-    function handleEmergencyClick() { const m = isEmergency ? 'modalReset' : 'modalEmergency'; document.getElementById(m).style.display = 'flex'; }
+    function handleEmergencyClick() { document.getElementById(isEmergency ? 'modalReset' : 'modalEmergency').style.display = 'flex'; }
     function actionEmergency(active) {
         isEmergency = active; closeModals();
         if (isEmergency) {
             isAutomaticMode = false; document.getElementById('main-emergency').classList.add('active');
-            ['sem1', 'sem2'].forEach(id => { setHardware(id, 'oc', 'off', ''); setHardware(id, 'relay', 'on', ''); updateUI(id, 'ROSSO'); 
-            const lbl = document.getElementById('label-'+id); if(lbl) { lbl.className='status-label emergenza'; lbl.innerText='● EMERGENZA'; } });
+            ['sem1', 'sem2'].forEach(id => { setHardware(id, 'oc', 'off'); setHardware(id, 'relay', 'on'); updateUI(id, 'ROSSO'); });
             addLog("⚠️ EMERGENZA: BLOCCO TOTALE.");
         } else { location.reload(); }
     }
+
     function saveTempi() {
-        const getV = (id) => Math.max(0, parseInt(document.getElementById(id).value) || 0);
-        const config = { rosso: (getV('tr-min')*60)+getV('tr-sec'), arancio: (getV('to-min')*60)+getV('to-sec'), verde: (getV('tg-min')*60)+getV('tg-sec'), sgombero: (getV('ts-min')*60)+getV('ts-sec') };
+        const gV = (id) => Math.max(0, parseInt(document.getElementById(id).value) || 0);
+        const config = { rosso: (gV('tr-min')*60)+gV('tr-sec'), arancio: (gV('to-min')*60)+gV('to-sec'), verde: (gV('tg-min')*60)+gV('tg-sec'), sgombero: (gV('ts-min')*60)+gV('ts-sec') };
         localStorage.setItem('pc_tlc_tempi_v4', JSON.stringify(config));
         document.getElementById('btn-start-auto').style.display = 'inline-block';
         alert("PARAMETRI SALVATI");
     }
-    function downloadLog() { 
-        const logText = document.getElementById('event-log').innerText;
-        const blob = new Blob([logText], { type: 'text/plain' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = `LOG_TLC_${new Date().toISOString().slice(0,10)}.txt`; a.click();
-    }
-    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
-    function toggleProgramBar() { const b = document.getElementById('prog-bar'); b.style.display = (b.style.display === 'none' || b.style.display === '') ? 'block' : 'none'; }
+
     function addLog(msg) {
         const area = document.getElementById('event-log');
         const op = document.getElementById('operatore-name').value.trim() || "SISTEMA";
@@ -502,17 +388,25 @@ function updateSem(id, type) {
         entry.innerHTML = `<span style="color:#888">[${new Date().toLocaleTimeString()}]</span> <b style="color:var(--pc-yellow)">[${op.toUpperCase()}]</b> ${msg}`;
         area.prepend(entry);
     }
+
+    function downloadLog() { 
+        const blob = new Blob([document.getElementById('event-log').innerText], { type: 'text/plain' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `LOG_TLC_${new Date().toISOString().slice(0,10)}.txt`; a.click();
+    }
+
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
+    function toggleProgramBar() { const b = document.getElementById('prog-bar'); b.style.display = b.style.display === 'none' ? 'block' : 'none'; }
     function updateDateTime() {
         document.getElementById('clock-display').innerText = new Date().toLocaleTimeString();
         document.getElementById('date-display').innerText = new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
     }
-    window.onload = () => { updateDateTime(); setInterval(updateDateTime, 1000); addLog("SISTEMA TLC v4.0 PRONTO."); };
+
+    window.onload = () => {
+        updateDateTime(); setInterval(updateDateTime, 1000);
+        checkOnlineStatus(); setInterval(checkOnlineStatus, 10000);
+        addLog("SISTEMA TLC v4.0 PRONTO.");
+    };
 </script>
 </body>
 </html>
-
-
-
-
-
-
