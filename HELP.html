@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manuale Tecnico - Protezione Civile</title>
+    <style>
+        /* Palette Protezione Civile 2026 */
+        :root {
+            --pc-blue: #1e3a8a;
+            --pc-yellow: #ffcc00;
+            --pc-light-grey: #f8f9fa;
+            --pc-border: #d1d5db;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            padding: 20px; 
+            background-color: #e5e7eb; 
+        }
+
+        /* Contenitore Principale con bordo superiore giallo */
+        .container { 
+            background: white; 
+            padding: 0; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            max-width: 840px; 
+            margin: auto; 
+            overflow: hidden;
+            border-top: 8px solid var(--pc-yellow);
+        }
+
+        /* Header in Blu Istituzionale */
+        header {
+            background-color: var(--pc-blue);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h2 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        .content { padding: 30px; }
+
+        /* Box Istruzioni Migliorato */
+        .step { 
+            background: var(--pc-light-grey); 
+            border: 1px solid var(--pc-border);
+            border-left: 6px solid var(--pc-blue); 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 0 8px 8px 0;
+            transition: transform 0.2s;
+        }
+        .step:hover { transform: translateX(5px); border-color: var(--pc-blue); }
+
+        .step strong { color: var(--pc-blue); display: block; margin-bottom: 5px; font-size: 1.1rem; }
+
+        /* Stile Immagini con cornice */
+        img { 
+            max-width: 100%; 
+            height: auto; 
+            display: block; 
+            margin: 15px 0; 
+            border: 3px solid white; 
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Box Note/Avviso con livrea Gialla */
+        .info-box { 
+            background: #fff9db; 
+            border: 2px solid var(--pc-yellow); 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-top: 25px;
+            position: relative;
+        }
+        .info-box strong { color: #856404; }
+
+        /* Ulteriori informazioni */
+        h3 { 
+            color: var(--pc-blue); 
+            border-bottom: 2px solid var(--pc-yellow); 
+            display: inline-block;
+            margin-top: 30px;
+        }
+
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+
+        .footer-info { 
+            font-size: 0.85em; 
+            color: #6b7280; 
+            background: #f3f4f6;
+            padding: 20px 30px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* Pulsante Chiudi - Stile Operativo */
+        .btn-chiudi { 
+            display: block; 
+            width: calc(100% - 60px); 
+            margin: 20px auto; 
+            padding: 15px; 
+            background: var(--pc-blue); 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        .btn-chiudi:hover { background: #152a61; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h2>Istruzioni Operative TLC</h2>
+            <small>PC Toscolano Maderno</small>
+        </header>
+        
+        <div class="content">
+            <p>Documentazione tecnica per l'operatività dei sistemi di comunicazione remota.</p>
+
+            <div class="step">
+                <strong>1. Verifica ZeroTier (VPN Remota)</strong>
+                Verifica la connessione ai dispositivi in VPN, come mostrato nell'immagine sottostante.
+                <img src="zero_tier.png" alt="Verifica ZeroTier">
+            </div>
+
+            <div class="step">
+                <strong>2. Verifica Tailscale (VPN Server)</strong>
+                Verifica la connessione attiva al Server della PC per la sincronizzazione degli stati, come mostrato nell'immagine sottostante.
+                <img src="Tailscale.png" alt="Verifica Tailscale">
+            </div>
+
+            <div class="step">
+                <strong>3. Gestione Campo Dati e Radio</strong>
+                Inserire sempre ID/nome operatore. Per la movimentazione del semaforo richiedere sempre il feedback via radio.
+            </div>
+
+			<div class="step">
+                <strong>4. MAPPA</strong>
+                La mappa ha la funzione di rilevare la posizione GPS del dispositivo PC, ed inserire in varie categorie atre posizioni, è disponibile anche l'esportazione tramite Excel delle coordinate e l'inserimento della posizione desiderata tramite la selezione sulla mappa con il Mouse.
+                <img src="mappa.png" alt="HelpIT">
+            </div>
+
+            <div class="step">
+                <strong>5. Supporto Tecnico HelpIT</strong>
+                Inviare richiesta di malfunzionamento dalla pagina principale tramite l'apposito pulsante.
+                <img src="HelpIT.png" alt="HelpIT">
+            </div>
+
+			
+
+            <h3>Informazioni Critiche</h3>
+            <ul>
+                <li><strong>Connessione:</strong> In caso di timeout, riavviare il modulo LTE.</li>
+                <li><strong>Sicurezza:</strong> Credenziali strettamente personali.</li>
+                <li><strong>Emergenze:</strong> Per guasti/malfunzionamenti GRAVI contattate il Reparto TLC della Protezione Civile di Toscolano Maderno < contattare il Reparto TLC.</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>AVVISO DI SICUREZZA:</strong> È vietata la diffusione e visualizzazione al personale non Autorizzato.
+            </div>
+        </div>
+
+        <div class="footer-info">
+            Aggiornamento: 03/01/2026 | Versione: 5.20.12<br>
+            Responsabile: <strong>Matteo Podavini</strong>
+        </div>
+
+        <button class="btn-chiudi" onclick="window.close()">Ho preso visione.Chiudi Documentazione</button>
+    </div>
+
+</body>
+</html>
