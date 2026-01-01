@@ -110,6 +110,16 @@
         <div class="instructions-box">
             <div class="instructions-header">
                 <h3>Pannello Operativo Digitale <span style="font-size: 0.6em; background: var(--pc-blue); color: white; padding: 2px 8px; border-radius: 10px;">v4.5.25</span></h3>
+                 <!-- 2. NUOVO BOTTONE MANUALE AL CENTRO -->
+    <div style="flex: 1; display: flex; justify-content: center;">
+        <button onclick="apriManualeTLC()" class="pc-manual-btn" style="transform: scale(0.85);">
+            <span class="pc-info-circle">?</span>
+            <span class="pc-btn-text">Manuale Tecnico TLC</span>
+        </button>
+    </div>
+
+    <!-- 3. Bottone Supporto a destra -->
+    <div style="flex: 1; display: flex; justify-content: flex-end;">
                 <button onclick="apriSupporto()" style="background:var(--pc-orange); color:var(--pc-blue); border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">🛠️ RICHIEDI SUPPORTO IT</button>
             </div>
             <div class="instructions-grid">
