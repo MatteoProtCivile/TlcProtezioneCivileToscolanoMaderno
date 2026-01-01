@@ -115,7 +115,7 @@
         <div class="top-buttons-row">
             <div class="top-btn-container">
                 <button id="main-emergency" class="btn-emergency-small" onclick="handleEmergencyClick()">
-                    🚨 EMERGENZA CHIUSURA STRADA 🚨
+                    🚨  CHIUSURA FORZATA STRADA 🚨
                 </button>
             </div>
             <div class="top-btn-container">
@@ -259,7 +259,7 @@
 <script>
     let isEmergency = false;
     let isAutomaticMode = false;
-    const netConfig = { sem1: '192.168.191.10', sem2: '192.168.191.17', nas: '100.111.26.63:85/update.php' };
+    const netConfig = { sem1: '192.168.191.16', sem2: '192.168.191.17', nas: '100.111.26.63:85/update.php' };
     const auth = "username=admin&password=Adminadmin01";
 
     async function checkOnlineStatus() {
@@ -426,5 +426,6 @@
 </script>
 </body>
 </html>
+
 
 
