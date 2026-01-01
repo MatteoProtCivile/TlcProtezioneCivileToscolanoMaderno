@@ -331,10 +331,10 @@
         <html>
         <body style="font-family:sans-serif;padding:30px;background:#eef2f5;">
             <h2 style="color:#002d5a;">🛠️ Supporto Tecnico</h2>
-            <form action="formspree.io" method="POST">
+            <form action="https://formspree.io/f/mwveqjrn" method="POST">
                 
                 <!-- Questa riga evita l'errore di file non trovato dopo l'invio -->
-                <input type="hidden" name="_next" value="formspree.io">
+                <input type="hidden" name="_next" value="https://formspree.io/f/mwveqjrn">
 
                 <label>Operatore:</label><br>
                 <input type="text" name="operatore" required style="width:100%;padding:10px;margin-bottom:20px;">
@@ -351,6 +351,7 @@
         </html>
     `);
 }
+
 
     function apriIndirizzo(s) { window.open('http://192.168.191.' + s, '_blank'); }
     function apriPortaManuale(p) { const ip = document.getElementById('ipManualeLibero').value; if(ip) window.open(`http://${ip}:${p}`); }
