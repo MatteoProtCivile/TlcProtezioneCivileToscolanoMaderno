@@ -103,6 +103,26 @@
             <label>Operatore:</label>
             <input type="text" id="operatore-name" placeholder="NOME COGNOME" required>
         </div>
+
+        <!-- POSIZIONE INSERIMENTO PULSANTE MANUALE TLC -->
+        <div style="flex: 1; display: flex; justify-content: center;">
+            <button onclick="apriManualeTLC()" style="
+                background-color: #1e3a8a; 
+                color: #ffcc00; 
+                border: 2px solid #ffcc00; 
+                padding: 12px 20px; 
+                font-weight: bold; 
+                text-transform: uppercase; 
+                cursor: pointer; 
+                border-radius: 5px;
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                font-family: sans-serif;">
+                <span style="font-size: 20px;">ℹ</span> MANUALE TECNICO TLC
+            </button>
+        </div>
+        
         <div class="datetime-display">
             <div id="clock-display">--:--:--</div>
             <span id="date-display" style="font-size:0.8rem; color:white">--/--/----</span>
@@ -425,3 +445,4 @@
 </script>
 </body>
 </html>
+
