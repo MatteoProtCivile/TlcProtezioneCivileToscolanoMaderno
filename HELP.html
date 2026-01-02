@@ -180,12 +180,30 @@
             Aggiornamento: 03/01/2026 | Versione: 5.20.12<br>
             Responsabile: <strong>Matteo Podavini</strong>
         </div>
-
+		 /* modifica script chiusura e html */
         <button class="btn-chiudi" onclick="chiudiOSalva()">Chiudi Documentazione</button>
 </div>
+<script>
+function chiudiOSalva() {
+    // Prova a chiudere la finestra direttamente
+    window.close();
 
+    // Se window.close() fallisce (comune sui browser moderni), 
+    // usiamo un fallback per tornare alla pagina principale o avvisare l'utente
+    setTimeout(function() {
+        if (!window.closed) {
+            // Opzione A: Reindirizza alla dashboard (Sostituisci 'index.html' con la tua home)
+            window.location.href = 'index.html'; 
+            
+            // Opzione B: Se preferisci l'avviso manuale, decommenta la riga sotto:
+            // alert("Chiusura automatica bloccata dal browser. Usa la 'X' della scheda o torna alla Home.");
+        }
+    }, 500);
+}
+</script>
 </body>
 </html>
+
 
 
 
