@@ -45,6 +45,40 @@
 
         h2 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
 
+        /* NUOVO BANNER TAILSCALE */
+        .ts-download-banner {
+            background-color: #fff9db;
+            border-bottom: 2px solid var(--pc-yellow);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .ts-text {
+            color: #856404;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .btn-ts-download {
+            background-color: var(--pc-blue);
+            color: white;
+            padding: 8px 18px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-ts-download:hover {
+            background-color: #152a61;
+        }
+
         .content { padding: 30px; }
 
         /* Box Istruzioni Migliorato */
@@ -129,11 +163,15 @@
             <h2>Istruzioni Operative TLC</h2>
             <small>PC Toscolano Maderno</small>
         </header>
+
+        <!-- BANNER DOWNLOAD TAILSCALE -->
+        <div class="ts-download-banner">
+            <div class="ts-text">Dispositivo non connesso alla VPN?</div>
+            <a href="tailscale.com" target="_blank" class="btn-ts-download">Scarica Tailscale</a>
+        </div>
         
         <div class="content">
             <p>Documentazione tecnica per l'operatività dei sistemi di comunicazione remota.</p>
-
-        
 
             <div class="step">
                 <strong>1. Verifica Tailscale (VPN Server)</strong>
@@ -158,8 +196,6 @@
                 <img src="HelpIT.png" alt="HelpIT">
             </div>
 
-			
-
             <h3>Informazioni Critiche</h3>
             <ul>
                 <li><strong>Connessione:</strong> In caso di timeout, riavviare il modulo LTE.</li>
@@ -173,7 +209,7 @@
         </div>
 
         <div class="footer-info">
-            Aggiornamento: 03/01/2026 | Versione: 5.20.12<br>
+            Aggiornamento: 14/01/2026 | Versione: 5.20.12<br>
             Responsabile: <strong>Matteo Podavini</strong>
         </div>
 		 
@@ -181,27 +217,13 @@
 </div>
 <script>
 function chiudiOSalva() {
-    // Prova a chiudere la finestra direttamente
     window.close();
-
-    // Se window.close() fallisce (comune sui browser moderni), 
-    // usiamo un fallback per tornare alla pagina principale o avvisare l'utente
     setTimeout(function() {
         if (!window.closed) {
-            // Opzione A: Reindirizza alla dashboard (Sostituisci 'index.html' con la tua home)
             window.location.href = 'index.html'; 
-            
-            // Opzione B: Se preferisci l'avviso manuale, decommenta la riga sotto:
-            // alert("Chiusura automatica bloccata dal browser. Usa la 'X' della scheda o torna alla Home.");
         }
     }, 500);
 }
 </script>
 </body>
 </html>
-
-
-
-
-
-
