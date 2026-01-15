@@ -44,20 +44,36 @@
             <input type="text" id="lat" placeholder="Latitudine" style="width:110px;">
             <input type="text" id="lng" placeholder="Longitudine" style="width:110px;">
             
-            <select id="poiColor">
-                <option value="blue">Standard (Blu)</option>
-                <option value="red">Emergenza (Rosso)</option>
-                <option value="green">Sanità (Verde)</option>
-                <option value="orange">Logistica (Arancio)</option>
-                <option value="yellow">Coordinamento (Oro)</option>
+             <select id="poiColor">
+                <optgroup label="Standard">
+                    <option value="blue">Standard (Blu)</option>
+                    <option value="red">Emergenza (Rosso)</option>
+                    <option value="green">Sanità (Verde)</option>
+                    <option value="orange">Logistica (Arancio)</option>
+                    <option value="yellow">Coordinamento (Oro)</option>
+                </optgroup>
+                <optgroup label="Speciali AIB / TLC">
+                    <option value="aib-fuoco">🔥 AIB - Incendio</option>
+                    <option value="aib-idrante">💧 Punto Idrico</option>
+                    <option value="aib-botte">🚛 Autobotte</option>
+                    <option value="drone">🚁 Unità Elicottero</option>
+                    <option value="ponte">📡 Ponte Radio</option>
+                    <option value="coc">🏛️ C.O.C. Comando</option>
+                    <option value="chiusura">🚫 Blocco Stradale</option>
+                    <option value="sub">🚤 Pompa Acqua</option>
+                    <option value="cinofili">🐕 Cinofili</option>
+                    <option value="frana">⚠️ Monitoraggio Incendio</option>
+                </optgroup>
             </select>
             
             <br>
             <button class="btn-gps" onclick="rilevaPosizione()">📍 GPS</button>
             <button onclick="aggiungiPunto()">AGGIUNGI PUNTO</button>
             <button class="btn-excel" onclick="esportaExcel()">📥 EXCEL</button>
+            <button class="btn-save-local" onclick="salvaMappaIntera()">💾 SALVA MAPPA LOCALE</button>
             <button class="btn-delete" onclick="svuotaMappa()">🗑️ RESET</button>
         </div>
+    </div>
 
         <!-- FILTRI PER TIPO DI UNITÀ -->
         <div class="controls-filters">
@@ -82,6 +98,9 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <script>
+	
+	
+	
         // Inizializzazione mappa
         var map = L.map('map').setView([45.6415, 10.6083], 13);
 		// Funzione per intercettare il click sulla mappa e compilare i campi coordinate
@@ -170,14 +189,25 @@
 
             marker.addTo(layerGroup);
         }
-
+		
+		
         function rilevaPosizione() {
-            if (!navigator.geolocation) return alert("GPS non supportato.");
-            navigator.geolocation.getCurrentPosition(function(position) {
-                document.getElementById('lat').value = position.coords.latitude.toFixed(6);
-                document.getElementById('lng').value = position.coords.longitude.toFixed(6);
-                map.setView([position.coords.latitude, position.coords.longitude], 15);
+            navigator.geolocation.getCurrentPosition(function(p) {
+                document.getElementById('lat').value = p.coords.latitude.toFixed(6);
+                document.getElementById('lng').value = p.coords.longitude.toFixed(6);
+                map.setView([p.coords.latitude, p.coords.longitude], 15);
             });
+        }
+
+        function salvaMappaIntera() {
+            var dati = JSON.stringify(salvataggioPOI);
+            var html = document.documentElement.outerHTML.replace(/var salvataggioPOI = .*?;/, "var salvataggioPOI = " + dati + ";");
+            var blob = new Blob([html], {type: 'text/html'});
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "Mappa_TLC_Toscolano_Maderno_2026.html";
+            a.click();
+            alert("File salvato! Apralo per vedere la situazione attuale anche senza internet.");
         }
 
         function aggiungiPunto() {
@@ -246,3 +276,4 @@
     </script>
 </body>
 </html>
+
