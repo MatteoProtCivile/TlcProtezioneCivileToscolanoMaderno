@@ -59,9 +59,6 @@
                     <option value="drone">🚁 Unità Elicottero</option>
                     <option value="ponte">📡 Ponte Radio</option>
                     <option value="coc">🏛️ C.O.C. Comando</option>
-					<option value="personale">👨‍🚒 Personale AIB</option>
-					<option value="avvistamento">🔭 Punto di Avvistamento</option>
-					<option value="DOS">👷 Dos</option>
                     <option value="chiusura">🚫 Blocco Stradale</option>
                     <option value="sub">🚤 Pompa Acqua</option>
                     <option value="cinofili">🐕 Cinofili</option>
@@ -168,10 +165,7 @@
         'aib-botte': '🚛',
         'drone': '🚁',
         'ponte': '📡',
-        'coc': '🏛️',
-		'aib-uomo': '👨‍🚒', 
-		'punto di vista': '🔭'
-		'aib-Dos': '👷', 	
+        'coc': '🏛️',	
         'chiusura': '🚫',
         'sub': '🚤',
         'cinofili': '🐕',
@@ -206,10 +200,10 @@
           function renderizzaMarker(poi) {
             var g = 'blue';
             var t = poi.color;
-            if (['red', 'aib-fuoco', 'chiusura', 'frana','avvistamento'].includes(t)) g = 'red';
-            else if (['green','personale-aib', 'cinofili'].includes(t)) g = 'green';
+            if (['red', 'aib-fuoco', 'chiusura', 'frana'].includes(t)) g = 'red';
+            else if (['green', 'cinofili'].includes(t)) g = 'green';
             else if (['orange', 'aib-botte'].includes(t)) g = 'orange';
-            else if (['yellow', 'dos','drone', 'coc'].includes(t)) g = 'yellow';
+            else if (['yellow','drone', 'coc'].includes(t)) g = 'yellow';
 
             L.marker([poi.lat, poi.lng], {icon: getIcon(poi.color)})
                 .bindPopup('<b>' + poi.nome + '</b><br>Lat: ' + poi.lat + '<br>Lng: ' + poi.lng)
@@ -286,6 +280,7 @@
     </script>
 </body>
 </html>
+
 
 
 
