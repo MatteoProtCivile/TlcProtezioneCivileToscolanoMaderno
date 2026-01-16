@@ -246,7 +246,7 @@
                 localStorage.removeItem('poi_data');
                 location.reload();
             }
-        }
+      }
 
         function esportaExcel() {
             if(salvataggioPOI.length === 0) return alert("Nessun dato.");
@@ -256,15 +256,25 @@
             XLSX.writeFile(wb, "Mappa_TLC.xlsx");
         }
 
-        function salvaMappaIntera() {
-            var datiStr = "var salvataggioPOI = " + JSON.stringify(salvataggioPOI) + ";";
-            var html = document.documentElement.outerHTML.replace(/var salvataggioPOI = .*?;/, datiStr);
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([html], {type: 'text/html'}));
-            a.download = "Mappa_TLC_Toscolano_2026.html";
-            a.click();
-        }
+			var salvataggioPOI = [];
 
+        function salvaMappaIntera() {
+    // Trasformiamo i dati in stringa
+    var datiStr = "var salvataggioPOI = " + JSON.stringify(salvataggioPOI) + ";";
+    
+    // Usiamo una Regex più precisa per trovare la riga var salvataggioPOI = ...;
+    // Questo evita che il replace fallisca se ci sono spazi o contenuti complessi
+    var codicePagina = document.documentElement.outerHTML;
+    var nuovoHtml = codicePagina.replace(/var salvataggioPOI = \[[\s\S]*?\];/, datiStr);
+    
+    var blob = new Blob([nuovoHtml], {type: 'text/html'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "Mappa_TLC_Toscolano_2026.html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
             var div = L.DomUtil.create('div', 'legend');
@@ -280,6 +290,7 @@
     </script>
 </body>
 </html>
+
 
 
 
