@@ -116,35 +116,71 @@
 });
 
 
-// 1. Definisci i Layer (OK)
+// 1. DEFINIZIONE DEI LAYER (Strade e Satellite)
 var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 });
 
-var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+var satellite = L.tileLayer('https://server.arcgisonline.com{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri'
 });
 
-// 2. CREA LA MAPPA (Assicurati di avere questa riga PRIMA del controllo)
-// Se non hai questa riga, aggiungila o cercala nel tuo codice
+// 2. INIZIALIZZAZIONE UNICA DELLA MAPPA (Leaflet)
+// Attenzione: deve esserci un solo L.map in tutto il file!
 var map = L.map('map', {
-    center: [45.6447, 10.6053], // Coordinate di Toscolano
+    center: [45.6447, 10.6053], // Toscolano
     zoom: 14,
     layers: [streets]
 });
 
-// 3. ORA INSERISCI IL CONTROLLO (Dopo che map è stata creata)
+// 3. GRUPPI PER I COLORI (Per gestire i filtri)
+var layersByColor = {
+    blue:   L.layerGroup().addTo(map),
+    red:    L.layerGroup().addTo(map),
+    green:  L.layerGroup().addTo(map),
+    orange: L.layerGroup().addTo(map),
+    yellow: L.layerGroup().addTo(map)
+};
+
+// 4. FUNZIONE CLICK PER COORDINATE
+map.on('click', function(e) {
+    var lat = e.latlng.lat.toFixed(6);
+    var lng = e.latlng.lng.toFixed(6);
+    
+    // Inserisce i numeri nei campi HTML del tuo modulo
+    if(document.getElementById('lat')) document.getElementById('lat').value = lat;
+    if(document.getElementById('lng')) document.getElementById('lng').value = lng;
+    
+    L.popup()
+        .setLatLng(e.latlng)
+        .setContent("Coordinate: <br>" + lat + ", " + lng)
+        .openOn(map);
+});
+
+// 5. CARICAMENTO AUTOMATICO DEI PUNTI SALVATI
+// Questo blocco fa apparire i punti quando apri il file salvato
 if (typeof salvataggioPOI !== 'undefined' && salvataggioPOI.length > 0) {
     salvataggioPOI.forEach(function(p) {
-        // NOTA: Se nella console vedi Lat/Lon con la maiuscola, scrivi p.Lat e p.Lon
-        L.marker([p.lat, p.lng])
-         .addTo(map)
-         .bindPopup(p.nome || "Punto salvato");
+        var lat = p.lat || p.Lat || p.Latitudine;
+        var lng = p.lng || p.Lon || p.Longitudine;
+        
+        if (lat && lng) {
+            var marker = L.marker([lat, lng]).bindPopup(p.nome || "Punto salvato");
+            var col = p.colore || 'blue';
+            
+            // Aggiunge il marker al gruppo del suo colore
+            if (layersByColor[col]) {
+                marker.addTo(layersByColor[col]);
+            } else {
+                marker.addTo(map);
+            }
+        }
     });
 }
 
-// 4. Aggiungi i controlli finali
-L.control.layers({"Strade": streets, "Satellite": satellite}).addTo(map);
+// 6. AGGIUNGI IL SELETTORE DEI LAYER (In alto a destra)
+L.control.layers({"Mappa Strade": streets, "Satellite": satellite}).addTo(map);
+
 
         // Di default: strade
         streets.addTo(map);
@@ -330,6 +366,7 @@ function salvaMappaIntera() {
     </script>
 </body>
 </html>
+
 
 
 
