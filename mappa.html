@@ -16,26 +16,26 @@
         .pc-header { background-color: #003399; color: #ffffff; padding: 15px; text-align: center; border-bottom: 5px solid #ffcc00; }
         .controls { background: #ffffff; padding: 10px 15px; border-bottom: 1px solid #ccc; position: relative; z-index: 1000; }
         .controls-top { text-align: center; margin-bottom: 8px; }
-        .controls-filters { font-size: 0.9em; text-align: center; }
-        .controls-filters label { margin: 0 5px; white-space: nowrap; }
+        .controls-filters { font-size: 0.9em; text-align: center; padding: 10px; border-top: 1px solid #eee; }
+        .controls-filters label { margin: 0 10px; cursor: pointer; }
         input, select { margin: 5px; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
         button { padding: 6px 12px; cursor: pointer; background: #003399; color: white; border: none; border-radius: 4px; font-weight: bold; margin: 5px; }
         .btn-gps { background: #ffcc00; color: #003399; }
         .btn-delete { background: #cc0000; }
         .btn-excel { background: #28a745; }
-        #map { height: 600px; width: 100%; border-bottom: 1px solid #ccc; }
+        .btn-save-local { background: #17a2b8; }
+        #map { height: 600px; width: 100%; border-bottom: 1px solid #ccc; background: #ddd; }
         .pc-footer { background-color: #003399; color: white; text-align: center; padding: 10px; font-size: 0.8em; border-top: 3px solid #ffcc00; }
-        
-        .legend { background: white; padding: 12px; line-height: 20px; color: #333; border: 2px solid #003399; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-        .legend b { display: block; margin-bottom: 5px; border-bottom: 1px solid #ccc; }
-        .legend i { width: 16px; height: 16px; float: left; margin-right: 10px; opacity: 1; border-radius: 50%; border: 1px solid #333; }
+		
+        .legend { background: white; padding: 10px; line-height: 18px; color: #333; border: 2px solid #003399; border-radius: 5px; }
+        .legend i { width: 14px; height: 14px; float: left; margin-right: 8px; border-radius: 50%; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
     <div class="pc-header">
         <h2 style="margin:0;">PROTEZIONE CIVILE TOSCOLANO MADERNO</h2>
-        <span style="font-size: 0.9em;">REPARTO TLC - OPERATIVO 2025</span>
+        <span style="font-size: 0.9em;">REPARTO TLC - OPERATIVO 2026</span>
     </div>
 
     <div class="controls">
@@ -44,7 +44,7 @@
             <input type="text" id="lat" placeholder="Latitudine" style="width:110px;">
             <input type="text" id="lng" placeholder="Longitudine" style="width:110px;">
             
-             <select id="poiColor">
+            <select id="poiColor">
                 <optgroup label="Standard">
                     <option value="blue">Standard (Blu)</option>
                     <option value="red">Emergenza (Rosso)</option>
@@ -62,7 +62,7 @@
                     <option value="chiusura">🚫 Blocco Stradale</option>
                     <option value="sub">🚤 Pompa Acqua</option>
                     <option value="cinofili">🐕 Cinofili</option>
-                    <option value="frana">⚠️ Monitoraggio Incendio</option>
+                    <option value="frana">⚠️ Monitoraggio</option>
                 </optgroup>
             </select>
             
@@ -73,9 +73,7 @@
             <button class="btn-save-local" onclick="salvaMappaIntera()">💾 SALVA MAPPA LOCALE</button>
             <button class="btn-delete" onclick="svuotaMappa()">🗑️ RESET</button>
         </div>
-    </div>
 
-        <!-- FILTRI PER TIPO DI UNITÀ -->
         <div class="controls-filters">
             <strong>Filtra unità:</strong>
             <label><input type="checkbox" class="filter-checkbox" data-color="blue" checked> Standard</label>
@@ -89,19 +87,18 @@
     <div id="map"></div>
 
     <div class="pc-footer">
-        Versione 2025.1 | Creatore: Matteo Podavini &reg; | Sistema di monitoraggio TLC
+        Versione 2026.1 | Creatore: Matteo Podavini &reg; | Sistema di monitoraggio TLC
     </div>
 
-    <!-- Script Librerie -->
+   <!-- Script Librerie -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.polylinemeasure@3.0.0/Leaflet.PolylineMeasure.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
+    
     <script>
-	
-	
-	
-        // Inizializzazione mappa
+       	
+         // Inizializzazione mappa
         var map = L.map('map').setView([45.6415, 10.6083], 13);
 		// Funzione per intercettare il click sulla mappa e compilare i campi coordinate
             map.on('click', function(e) {
@@ -161,119 +158,123 @@
             measureControlTitleOff: 'Disattiva misurazione distanze'
         }).addTo(map);
 
-        // Icone colorate
-        function getIcon(color) {
-            return new L.Icon({
-                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-' + color + '.png',
-                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
-        }
+        function getIcon(tipo) {
+    var iconeSpeciali = {
+        'aib-fuoco': '🔥',
+        'aib-idrante': '💧',
+        'aib-botte': '🚛',
+        'drone': '🚁',
+        'ponte': '📡',
+        'coc': '🏛️',
+        'chiusura': '🚫',
+        'sub': '🚤',
+        'cinofili': '🐕',
+        'frana': '⚠️'
+    };
 
-        // Renderizza tutti i POI salvati
-        window.onload = function() {
-            salvataggioPOI.forEach(poi => renderizzaMarker(poi));
-            setTimeout(function(){ map.invalidateSize(); }, 500);
-            inizializzaFiltri();
-        };
+    // Se è un'unità speciale, creiamo un marker con l'Emoji
+    if (iconeSpeciali[tipo]) {
+        return L.divIcon({
+            html: '<div style="font-size: 24px; background: white; border-radius: 50%; padding: 5px; border: 2px solid #003399; text-align: center; width: 30px; height: 30px; line-height: 30px;">' + iconeSpeciali[tipo] + '</div>',
+            className: 'custom-div-icon',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -20]
+        });
+    }
+
+    // Per le unità standard, usiamo il marker colorato classico
+    var col = (tipo === 'yellow') ? 'gold' : (tipo || 'blue');
+    return new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com' + col + '.png',
+        shadowUrl: 'https://unpkg.com',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+}
+
 
         function renderizzaMarker(poi) {
-            var color = poi.color || 'blue';
-            var layerGroup = layersByColor[color] || layersByColor.blue;
+            var g = 'blue';
+            var t = poi.color;
+            if (['red', 'aib-fuoco', 'chiusura', 'frana'].includes(t)) g = 'red';
+            else if (['green', 'cinofili'].includes(t)) g = 'green';
+            else if (['orange', 'aib-botte'].includes(t)) g = 'orange';
+            else if (['yellow', 'drone', 'coc'].includes(t)) g = 'yellow';
 
-            var marker = L.marker([poi.lat, poi.lng], {icon: getIcon(color)})
-                .bindPopup('<b>' + poi.nome + '</b><br>Lat: ' + poi.lat + '<br>Lng: ' + poi.lng + '<br>Tipo: ' + color);
-
-            marker.addTo(layerGroup);
+            L.marker([poi.lat, poi.lng], {icon: getIcon(poi.color)})
+                .bindPopup('<b>' + poi.nome + '</b><br>Lat: ' + poi.lat + '<br>Lng: ' + poi.lng)
+                .addTo(layersByColor[g]);
         }
-		
-		
+
+        window.onload = function() {
+            salvataggioPOI.forEach(renderizzaMarker);
+            document.querySelectorAll('.filter-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    var color = this.getAttribute('data-color');
+                    this.checked ? map.addLayer(layersByColor[color]) : map.removeLayer(layersByColor[color]);
+                });
+            });
+        };
+
+        function aggiungiPunto() {
+            var lat = parseFloat(document.getElementById('lat').value);
+            var lng = parseFloat(document.getElementById('lng').value);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                var p = {lat: lat, lng: lng, nome: document.getElementById('poiName').value || "Unità TLC", color: document.getElementById('poiColor').value};
+                salvataggioPOI.push(p);
+                localStorage.setItem('poi_data', JSON.stringify(salvataggioPOI));
+                renderizzaMarker(p);
+                map.setView([lat, lng], 15);
+            } else { alert("Inserisci coordinate valide."); }
+        }
+
         function rilevaPosizione() {
-            navigator.geolocation.getCurrentPosition(function(p) {
+            navigator.geolocation.getCurrentPosition(p => {
                 document.getElementById('lat').value = p.coords.latitude.toFixed(6);
                 document.getElementById('lng').value = p.coords.longitude.toFixed(6);
                 map.setView([p.coords.latitude, p.coords.longitude], 15);
             });
         }
 
-        function salvaMappaIntera() {
-            var dati = JSON.stringify(salvataggioPOI);
-            var html = document.documentElement.outerHTML.replace(/var salvataggioPOI = .*?;/, "var salvataggioPOI = " + dati + ";");
-            var blob = new Blob([html], {type: 'text/html'});
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "Mappa_TLC_Toscolano_Maderno_2026.html";
-            a.click();
-            alert("File salvato! Apralo per vedere la situazione attuale anche senza internet.");
-        }
-
-        function aggiungiPunto() {
-            var lat = parseFloat(document.getElementById('lat').value);
-            var lng = parseFloat(document.getElementById('lng').value);
-            var nome = document.getElementById('poiName').value || "Unità TLC";
-            var colore = document.getElementById('poiColor').value;
-
-            if (lat && lng) {
-                var nuovoPOI = { lat: lat, lng: lng, nome: nome, color: colore, data: new Date().toLocaleString() };
-                salvataggioPOI.push(nuovoPOI);
-                localStorage.setItem('poi_data', JSON.stringify(salvataggioPOI));
-                renderizzaMarker(nuovoPOI);
-                map.setView([lat, lng], 15);
-            } else {
-                alert("Inserisci coordinate valide.");
-            }
-        }
-
         function svuotaMappa() {
             if(confirm("Cancellare tutti i punti?")) {
                 localStorage.removeItem('poi_data');
-                salvataggioPOI = [];
-                Object.keys(layersByColor).forEach(function(color) {
-                    layersByColor[color].clearLayers();
-                });
+                location.reload();
             }
         }
 
         function esportaExcel() {
             if(salvataggioPOI.length === 0) return alert("Nessun dato.");
-            var worksheet = XLSX.utils.json_to_sheet(salvataggioPOI);
-            var workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "POI_TLC");
-            XLSX.writeFile(workbook, "Mappa_TLC.xlsx");
+            var ws = XLSX.utils.json_to_sheet(salvataggioPOI);
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "POI_TLC");
+            XLSX.writeFile(wb, "Mappa_TLC.xlsx");
         }
 
-        // Gestione filtri
-        function inizializzaFiltri() {
-            var checkboxes = document.querySelectorAll('.filter-checkbox');
-            checkboxes.forEach(function(cb) {
-                cb.addEventListener('change', function() {
-                    var color = this.getAttribute('data-color');
-                    if (this.checked) {
-                        layersByColor[color].addTo(map);
-                    } else {
-                        map.removeLayer(layersByColor[color]);
-                    }
-                });
-            });
+        function salvaMappaIntera() {
+            var datiStr = "var salvataggioPOI = " + JSON.stringify(salvataggioPOI) + ";";
+            var html = document.documentElement.outerHTML.replace(/var salvataggioPOI = .*?;/, datiStr);
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([html], {type: 'text/html'}));
+            a.download = "Mappa_TLC_Toscolano_2026.html";
+            a.click();
         }
 
-        // Legenda dei POI
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
             var div = L.DomUtil.create('div', 'legend');
-            div.innerHTML += '<b>LEGENDA UNITÀ</b><br>';
-            div.innerHTML += '<i style="background: #2a82cb"></i> Standard<br>';
-            div.innerHTML += '<i style="background: #cb2b3e"></i> Emergenza<br>';
-            div.innerHTML += '<i style="background: #2aad27"></i> Sanità<br>';
-            div.innerHTML += '<i style="background: #cb832b"></i> Logistica<br>';
-            div.innerHTML += '<i style="background: #ffc107"></i> Coordinamento<br>';
+            div.innerHTML = '<b>LEGENDA UNITÀ</b><br>' +
+                '<i style="background: #2a82cb"></i> Standard<br>' +
+                '<i style="background: #cb2b3e"></i> Emergenza/AIB<br>' +
+                '<i style="background: #2aad27"></i> Sanità<br>' +
+                '<i style="background: #cb832b"></i> Logistica<br>' +
+                '<i style="background: #ffc107"></i> Coordinamento';
             return div;
         };
         legend.addTo(map);
     </script>
 </body>
 </html>
-
