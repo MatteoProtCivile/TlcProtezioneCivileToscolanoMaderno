@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -116,7 +117,7 @@
 });
 
 
-  // Layer di base: strade (OSM) e satellite (Esri)
+        // Layer di base: strade (OSM) e satellite (Esri)
         var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         });
@@ -125,62 +126,6 @@
             'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 attribution: 'Tiles &copy; Esri'
         });
-// 2. INIZIALIZZAZIONE UNICA DELLA MAPPA (Leaflet)
-// Attenzione: deve esserci un solo L.map in tutto il file!
-var map = L.map('map', {
-    center: [45.6447, 10.6053], // Toscolano
-    zoom: 14,
-    layers: [streets]
-});
-
-// 3. GRUPPI PER I COLORI (Per gestire i filtri)
-var layersByColor = {
-    blue:   L.layerGroup().addTo(map),
-    red:    L.layerGroup().addTo(map),
-    green:  L.layerGroup().addTo(map),
-    orange: L.layerGroup().addTo(map),
-    yellow: L.layerGroup().addTo(map)
-};
-
-// 4. FUNZIONE CLICK PER COORDINATE
-map.on('click', function(e) {
-    var lat = e.latlng.lat.toFixed(6);
-    var lng = e.latlng.lng.toFixed(6);
-    
-    // Inserisce i numeri nei campi HTML del tuo modulo
-    if(document.getElementById('lat')) document.getElementById('lat').value = lat;
-    if(document.getElementById('lng')) document.getElementById('lng').value = lng;
-    
-    L.popup()
-        .setLatLng(e.latlng)
-        .setContent("Coordinate: <br>" + lat + ", " + lng)
-        .openOn(map);
-});
-
-// 5. CARICAMENTO AUTOMATICO DEI PUNTI SALVATI
-// Questo blocco fa apparire i punti quando apri il file salvato
-if (typeof salvataggioPOI !== 'undefined' && salvataggioPOI.length > 0) {
-    salvataggioPOI.forEach(function(p) {
-        var lat = p.lat || p.Lat || p.Latitudine;
-        var lng = p.lng || p.Lon || p.Longitudine;
-        
-        if (lat && lng) {
-            var marker = L.marker([lat, lng]).bindPopup(p.nome || "Punto salvato");
-            var col = p.colore || 'blue';
-            
-            // Aggiunge il marker al gruppo del suo colore
-            if (layersByColor[col]) {
-                marker.addTo(layersByColor[col]);
-            } else {
-                marker.addTo(map);
-            }
-        }
-    });
-}
-
-// 6. AGGIUNGI IL SELETTORE DEI LAYER (In alto a destra)
-L.control.layers({"Mappa Strade": streets, "Satellite": satellite}).addTo(map);
-
 
         // Di default: strade
         streets.addTo(map);
@@ -302,7 +247,7 @@ L.control.layers({"Mappa Strade": streets, "Satellite": satellite}).addTo(map);
                 localStorage.removeItem('poi_data');
                 location.reload();
             }
-      }
+        }
 
         function esportaExcel() {
             if(salvataggioPOI.length === 0) return alert("Nessun dato.");
@@ -312,44 +257,14 @@ L.control.layers({"Mappa Strade": streets, "Satellite": satellite}).addTo(map);
             XLSX.writeFile(wb, "Mappa_TLC.xlsx");
         }
 
-			var salvataggioPOI = [];
-
-function salvaMappaIntera() {
-    // 1. Prepariamo la stringa con i 10 punti che hai visto in console
-    var datiStr = "var salvataggioPOI = " + JSON.stringify(salvataggioPOI) + ";";
-    
-    // 2. Prendiamo tutto il codice della pagina
-    var htmlCorrente = document.documentElement.outerHTML;
-    
-    // 3. REGEX POTENZIATA: Cerca la variabile salvataggioPOI in qualsiasi modo sia scritta
-    // Cerca "var salvataggioPOI =" seguito da qualunque cosa fino al punto e virgola
-    var regex = /var\s+salvataggioPOI\s*=\s*\[[\s\S]*?\]\s*;/;
-    
-    var nuovoHtml;
-    if (regex.test(htmlCorrente)) {
-        // Se trova la riga, la sostituisce
-        nuovoHtml = htmlCorrente.replace(regex, datiStr);
-    } else {
-        // Se NON la trova, la inserisce forzatamente all'inizio del primo script
-        console.warn("Variabile non trovata nel testo, forzo l'inserimento...");
-        nuovoHtml = htmlCorrente.replace("<script>", "<script>\n" + datiStr);
-    }
-    
-    // 4. Procedura di scaricamento migliorata per il 2026
-    var blob = new Blob([nuovoHtml], {type: 'text/html'});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = "Mappa_TLC_Toscolano_2026.html";
-    document.body.appendChild(a);
-    a.click();
-    
-    // Pulizia
-    setTimeout(function() {
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-    }, 100);
-}
+        function salvaMappaIntera() {
+            var datiStr = "var salvataggioPOI = " + JSON.stringify(salvataggioPOI) + ";";
+            var html = document.documentElement.outerHTML.replace(/var salvataggioPOI = .*?;/, datiStr);
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([html], {type: 'text/html'}));
+            a.download = "Mappa_TLC_Toscolano_2026.html";
+            a.click();
+        }
 
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
@@ -366,11 +281,6 @@ function salvaMappaIntera() {
     </script>
 </body>
 </html>
-
-
-
-
-
 
 
 
