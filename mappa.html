@@ -258,23 +258,43 @@
 
 			var salvataggioPOI = [];
 
-        function salvaMappaIntera() {
-    // Trasformiamo i dati in stringa
+function salvaMappaIntera() {
+    // 1. Prepariamo la stringa con i 10 punti che hai visto in console
     var datiStr = "var salvataggioPOI = " + JSON.stringify(salvataggioPOI) + ";";
     
-    // Usiamo una Regex più precisa per trovare la riga var salvataggioPOI = ...;
-    // Questo evita che il replace fallisca se ci sono spazi o contenuti complessi
-    var codicePagina = document.documentElement.outerHTML;
-    var nuovoHtml = codicePagina.replace(/var salvataggioPOI = \[[\s\S]*?\];/, datiStr);
+    // 2. Prendiamo tutto il codice della pagina
+    var htmlCorrente = document.documentElement.outerHTML;
     
+    // 3. REGEX POTENZIATA: Cerca la variabile salvataggioPOI in qualsiasi modo sia scritta
+    // Cerca "var salvataggioPOI =" seguito da qualunque cosa fino al punto e virgola
+    var regex = /var\s+salvataggioPOI\s*=\s*\[[\s\S]*?\]\s*;/;
+    
+    var nuovoHtml;
+    if (regex.test(htmlCorrente)) {
+        // Se trova la riga, la sostituisce
+        nuovoHtml = htmlCorrente.replace(regex, datiStr);
+    } else {
+        // Se NON la trova, la inserisce forzatamente all'inizio del primo script
+        console.warn("Variabile non trovata nel testo, forzo l'inserimento...");
+        nuovoHtml = htmlCorrente.replace("<script>", "<script>\n" + datiStr);
+    }
+    
+    // 4. Procedura di scaricamento migliorata per il 2026
     var blob = new Blob([nuovoHtml], {type: 'text/html'});
+    var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+    a.href = url;
     a.download = "Mappa_TLC_Toscolano_2026.html";
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
+    
+    // Pulizia
+    setTimeout(function() {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 100);
 }
+
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
             var div = L.DomUtil.create('div', 'legend');
@@ -290,6 +310,7 @@
     </script>
 </body>
 </html>
+
 
 
 
