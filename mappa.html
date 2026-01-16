@@ -116,15 +116,35 @@
 });
 
 
-        // Layer di base: strade (OSM) e satellite (Esri)
-        var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        });
+// 1. Definisci i Layer (OK)
+var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+});
 
-        var satellite = L.tileLayer(
-            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri'
-        });
+var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri'
+});
+
+// 2. CREA LA MAPPA (Assicurati di avere questa riga PRIMA del controllo)
+// Se non hai questa riga, aggiungila o cercala nel tuo codice
+var map = L.map('map', {
+    center: [45.6447, 10.6053], // Coordinate di Toscolano
+    zoom: 14,
+    layers: [streets]
+});
+
+// 3. ORA INSERISCI IL CONTROLLO (Dopo che map è stata creata)
+if (typeof salvataggioPOI !== 'undefined' && salvataggioPOI.length > 0) {
+    salvataggioPOI.forEach(function(p) {
+        // NOTA: Se nella console vedi Lat/Lon con la maiuscola, scrivi p.Lat e p.Lon
+        L.marker([p.lat, p.lng])
+         .addTo(map)
+         .bindPopup(p.nome || "Punto salvato");
+    });
+}
+
+// 4. Aggiungi i controlli finali
+L.control.layers({"Strade": streets, "Satellite": satellite}).addTo(map);
 
         // Di default: strade
         streets.addTo(map);
@@ -310,6 +330,7 @@ function salvaMappaIntera() {
     </script>
 </body>
 </html>
+
 
 
 
