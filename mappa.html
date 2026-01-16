@@ -116,15 +116,15 @@
 });
 
 
-// 1. DEFINIZIONE DEI LAYER (Strade e Satellite)
-var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-});
+  // Layer di base: strade (OSM) e satellite (Esri)
+        var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        });
 
-var satellite = L.tileLayer('https://server.arcgisonline.com{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri'
-});
-
+        var satellite = L.tileLayer(
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri'
+        });
 // 2. INIZIALIZZAZIONE UNICA DELLA MAPPA (Leaflet)
 // Attenzione: deve esserci un solo L.map in tutto il file!
 var map = L.map('map', {
@@ -366,6 +366,7 @@ function salvaMappaIntera() {
     </script>
 </body>
 </html>
+
 
 
 
