@@ -60,7 +60,6 @@
                     <option value="ponte">📡 Ponte Radio</option>
                     <option value="coc">🏛️ C.O.C. Comando</option>
 					<option value="personale">👨‍🚒 Personale AIB</option>
-					<option value="motosega">🪚 Motosega</option>
 					<option value="avvistamento">🔭 Punto di Avvistamento</option>
 					<option value="DOS">👷 Dos</option>
                     <option value="chiusura">🚫 Blocco Stradale</option>
@@ -170,8 +169,7 @@
         'drone': '🚁',
         'ponte': '📡',
         'coc': '🏛️',
-		'aib-uomo': '👨‍🚒',
-		'aib-motosega': '🪚', 
+		'aib-uomo': '👨‍🚒', 
 		'punto di vista': '🔭'
 		'aib-Dos': '👷', 	
         'chiusura': '🚫',
@@ -211,7 +209,7 @@
 
     if (['red', 'aib-fuoco', 'frana', 'chiusura', 'avvistamento'].includes(t)) g = 'red';
     else if (['green', 'personale-aib', 'cinofili'].includes(t)) g = 'green';
-    else if (['orange', 'motosega', 'aib-botte'].includes(t)) g = 'orange';
+    else if (['orange','aib-botte'].includes(t)) g = 'orange';
     else if (['yellow', 'dos', 'drone', 'ponte'].includes(t)) g = 'yellow';
 
     L.marker([poi.lat, poi.lng], {icon: getIcon(t)})
@@ -289,6 +287,7 @@
     </script>
 </body>
 </html>
+
 
 
 
