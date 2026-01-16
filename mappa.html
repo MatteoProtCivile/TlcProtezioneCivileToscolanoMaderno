@@ -203,19 +203,18 @@
 }
 
 
-       function renderizzaMarker(poi) {
-    var g = 'blue';
-    var t = poi.color;
+          function renderizzaMarker(poi) {
+            var g = 'blue';
+            var t = poi.color;
+            if (['red', 'aib-fuoco', 'chiusura', 'frana','avvistamento'].includes(t)) g = 'red';
+            else if (['green','personale-aib', 'cinofili'].includes(t)) g = 'green';
+            else if (['orange', 'aib-botte'].includes(t)) g = 'orange';
+            else if (['yellow', 'dos','drone', 'coc'].includes(t)) g = 'yellow';
 
-    if (['red', 'aib-fuoco', 'frana', 'chiusura', 'avvistamento'].includes(t)) g = 'red';
-    else if (['green', 'personale-aib', 'cinofili'].includes(t)) g = 'green';
-    else if (['orange','aib-botte'].includes(t)) g = 'orange';
-    else if (['yellow', 'dos', 'drone', 'ponte'].includes(t)) g = 'yellow';
-
-    L.marker([poi.lat, poi.lng], {icon: getIcon(t)})
-        .bindPopup('<b>' + poi.nome + '</b>')
-        .addTo(layersByColor[g]);
-}
+            L.marker([poi.lat, poi.lng], {icon: getIcon(poi.color)})
+                .bindPopup('<b>' + poi.nome + '</b><br>Lat: ' + poi.lat + '<br>Lng: ' + poi.lng)
+                .addTo(layersByColor[g]);
+        }
 
 
         window.onload = function() {
@@ -287,6 +286,7 @@
     </script>
 </body>
 </html>
+
 
 
 
