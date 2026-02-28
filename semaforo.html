@@ -217,12 +217,12 @@
                     <input type="number" id="ts-min" value="0" min="0" style="width:40px; padding:4px; border:1px solid var(--pc-blue);"> <span style="font-size:0.7rem">m</span>
                     <input type="number" id="ts-sec" value="10" min="0" max="59" style="width:40px; padding:4px; border:1px solid var(--pc-blue);"> <span style="font-size:0.7rem">s</span>
                 </div>
-                <div id="countdown-display">00:00</div>
-                <div style="display:flex; gap:8px;">
-                    <button onclick="saveTempi()" style="background:var(--status-green); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">CONFERMA TEMPI</button>
-                    <button id="btn-start-auto" onclick="toggleAutomation()" style="display:none; background:var(--emergency-blue); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">AVVIA AUTOMAZIONE</button>
-                    <button onclick="toggleProgramBar()" style="background:var(--status-red); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">CHIUDI</button>
-                </div>
+               <div id="countdown-display" style="font-size: 3rem; font-weight: bold; margin-bottom: 10px;">00:00</div>
+<div style="display:flex; gap:8px;">
+    <button onclick="saveTempi()" style="background:var(--status-green); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">CONFERMA TEMPI</button>
+    <button id="btn-start-auto" onclick="toggleAutomation()" style="display:none; background:var(--emergency-blue); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">AVVIA AUTOMAZIONE</button>
+    <button onclick="toggleProgramBar()" style="background:var(--status-red); color:white; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;">CHIUDI</button>
+</div>
             </div>
         </div>
 
@@ -426,6 +426,7 @@
 </script>
 </body>
 </html>
+
 
 
 
