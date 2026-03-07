@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -37,7 +38,7 @@
 
     <div class="pc-header">
         <h2 style="margin:0;">PROTEZIONE CIVILE TOSCOLANO MADERNO</h2>
-        <span style="font-size: 0.9em;">REPARTO TLC - OPERATIVO 2026</span>
+        <span style="font-size: 0.9em;">REPARTO Telecomunicazioni - OPERATIVO 2026</span>
     </div>
 
     <div class="controls">
@@ -46,26 +47,32 @@
             <input type="text" id="lat" placeholder="Latitudine" style="width:110px;">
             <input type="text" id="lng" placeholder="Longitudine" style="width:110px;">
             
-            <select id="poiColor">
-                <optgroup label="Standard">
-                    <option value="blue">Standard (Blu)</option>
-                    <option value="red">Emergenza (Rosso)</option>
-                    <option value="green">Sanità (Verde)</option>
-                    <option value="orange">Logistica (Arancio)</option>
-                    <option value="yellow">Coordinamento (Oro)</option>
-                </optgroup>
-                <optgroup label="Speciali AIB ">
-                    <option value="aib-fuoco">🔥 AIB - Incendio</option>
+          <select id="poiColor">
+   
+                <optgroup label="">
+                    <option value="aib-fuoco">🔥 Incendio</option>
                     <option value="aib-idrante">💧 Punto Idrico</option>
                     <option value="aib-botte">🚛 Autobotte</option>
-                    <option value="drone">🚁 Unità Elicottero</option>
-                    <option value="ponte">📡 Ponte Radio</option>
+                    <option value="elicottero">🚁 Elicottero</option>
+                    <option value="ponte">📡 Punto Telecomunicazioni</option>
                     <option value="coc">🏛️ C.O.C. Comando</option>
-                    <option value="chiusura">🚫 Blocco Stradale</option>
-                    <option value="sub">🚤 Pompa Acqua</option>
-                    <option value="cinofili">🐕 Cinofili</option>
-                    <option value="frana">⚠️ Monitoraggio</option>
-	                </optgroup>
+                    <option value="parco mezzi">🅿️ Parcheggio Mezzi Soccorso</option>
+                   <option value="semaforo">🚦 Semaforo</option>
+                    <option value="Squadra AIB">👷 Squadra AIB</option>
+					 <option value="drone">🛩️ Drone</option>
+					 <option value="DOS">⛑️ DOS</option>
+                    <option value="monitoraggio">⚠️ Monitoraggio</option>
+					<option value="Operatore PC">🚶 Operatore PC</option>
+					<option value="Telecamera">📷 Telecamera / Monitoraggio</option>
+					<option value="Antenna">🗼 Ripetitore / Ponte Radio</option>
+					<option value="Polizia Locale">🚓 Veicolo Polizia Locale</option>
+					 <option value="lampeggiante-blu">🔷 Veicolo Protezione Civile</option>
+					 <option value="Soccorso Sanitario">🚑 Soccorso Sanitario</option>
+					 <option value="transenna">🚧 Transenna / Blocco</option>
+					 <option value="allagamento">🌊 Allagamento / Esondazione</option>
+					 <option value="frana">⛰️ Frana / Smottamento</option>
+					 <option value="divieto">🚫 Strada Chiusa</option>
+					 </optgroup>
             </select>
             
             <br>
@@ -76,20 +83,12 @@
             <button class="btn-delete" onclick="svuotaMappa()">🗑️ RESET</button>
         </div>
 
-        <div class="controls-filters">
-            <strong>Filtra unità:</strong>
-            <label><input type="checkbox" class="filter-checkbox" data-color="blue" checked> Standard</label>
-            <label><input type="checkbox" class="filter-checkbox" data-color="red" checked> Emergenza</label>
-            <label><input type="checkbox" class="filter-checkbox" data-color="green" checked> Sanità</label>
-            <label><input type="checkbox" class="filter-checkbox" data-color="orange" checked> Logistica</label>
-            <label><input type="checkbox" class="filter-checkbox" data-color="yellow" checked> Coordinamento</label>
-        </div>
-    </div>
+        
 
     <div id="map"></div>
 
     <div class="pc-footer">
-        Versione 2026.1 | Creatore: Matteo Podavini &reg; | Sistema di monitoraggio TLC
+        Versione 2026.1 | Matteo Podavini &reg; | Sistema di monitoraggio TLC
     </div>
 
    <!-- Script Librerie -->
@@ -166,13 +165,28 @@
         'aib-fuoco': '🔥',
         'aib-idrante': '💧',
         'aib-botte': '🚛',
-        'drone': '🚁',
+        'elicottero': '🚁',
         'ponte': '📡',
         'coc': '🏛️',	
-        'chiusura': '🚫',
-        'sub': '🚤',
-        'cinofili': '🐕',
-        'frana': '⚠️'
+        'parco mezzi': '🅿️',
+        'semaforo': '🚦',
+        'Squadra AIB': '👷',
+		'drone': '🛩️',
+		'DOS': '⛑️',
+        'monitoraggio': '⚠️',
+		'Operatore PC': '🚶',
+		'Telecamera': '📷',
+		'Antenna' : '🗼',
+		'Polizia Locale': '🚓',
+		'lampeggiante-blu': '🔷',
+		'Soccorso Sanitario' : '🚑',
+		'transenna' :'🚧',
+		'allagamento': '🌊',
+		'frana':'⛰️',
+		'divieto' : '🚫'
+		
+		
+		
 	 
     };
 
@@ -187,17 +201,24 @@
         });
     }
 
-    // Per le unità standard, usiamo il marker colorato classico
-    var col = (tipo === 'yellow') ? 'gold' : (tipo || 'blue');
+       // Estraiamo il colore: se il tipo è "flag-red" diventa "red"
+    var colore = tipo.includes('flag-') ? tipo.replace('flag-', '') : tipo;
+    
+    // Correzione nomi colori per il server delle icone
+    if (colore === 'yellow') colore = 'gold';
+    if (!colore || colore === 'sub') colore = 'blue'; 
+
+    // Ritorna l'icona grafica corretta
     return new L.Icon({
-        iconUrl: 'https://raw.githubusercontent.com' + col + '.png',
-        shadowUrl: 'https://unpkg.com',
+        iconUrl: 'https://raw.githubusercontent.com' + colore + '.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com',
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
         shadowSize: [41, 41]
     });
 }
+
 
 
           function renderizzaMarker(poi) {
