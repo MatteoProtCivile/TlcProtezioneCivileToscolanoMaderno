@@ -1,3 +1,3 @@
-if (username === "admin" && password === "pctlc") {
+if (username === "admin" && password === "tlc") {
     window.location.href = "riservata.html"; 
 }
